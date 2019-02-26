@@ -1,5 +1,3 @@
-local SignGenerator = require"signgenerator"
-
 local taggables = {}
 
 taggables.makescreen = function(inst, doer)
@@ -9,11 +7,9 @@ taggables.makescreen = function(inst, doer)
 		animbuild = "ui_board_5x1",
 		menuoffset = Vector3(6, 20, 0),
 
-		cancelbtn = { text = STRINGS.SIGNS.MENU.CANCEL,			cb = nil, control = CONTROL_CANCEL },
-		middlebtn = { text = STRINGS.TAGGABLE_REMOVE_BUTTON,	cb = nil, control = CONTROL_MENU_MISC_2 },
-		acceptbtn = { text = STRINGS.SIGNS.MENU.ACCEPT,			cb = nil, control = CONTROL_ACCEPT },
-
-		--defaulttext = SignGenerator,
+		cancelbtn = { text = STRINGS.SIGNS.MENU.CANCEL,	cb = nil, control = CONTROL_CANCEL },
+		middlebtn = { text = STRINGS.SIGNS.MENU.REMOVE,	cb = nil, control = CONTROL_MENU_MISC_2 },
+		acceptbtn = { text = STRINGS.SIGNS.MENU.ACCEPT,	cb = nil, control = CONTROL_ACCEPT },
 	}
 
     if doer and doer.HUD then

@@ -1,4 +1,4 @@
-local scheme = Class(function(self, inst)
+local Scheme = Class(function(self, inst)
     self.inst = inst
 	self.index = nil
 
@@ -8,7 +8,7 @@ local scheme = Class(function(self, inst)
 	self.pointer = nil
 end)
 
-function scheme:OnActivate(other, doer) 
+function Scheme:OnActivate(other, doer) 
 	other.sg:GoToState("open")
 	other:DoTaskInTime(1.5, function()
 		other.sg:GoToState("closing")
@@ -16,7 +16,7 @@ function scheme:OnActivate(other, doer)
 	end)
 end
 
-function scheme:CheckConditionAndCost(doer, index)
+function Scheme:CheckConditionAndCost(doer, index)
 	if not self:IsConnected(index) then return end
 	local numalter, numstat = _G.GetGCost(doer, false)
 	if doer:HasTag("yakumoyukari") and doer.components.power ~= nil and doer.components.talker ~= nil and doer.components.power.current < doer.components.upgrader.schemecost then 
@@ -34,7 +34,7 @@ function scheme:CheckConditionAndCost(doer, index)
 	return true
 end
 
-function scheme:Activate(doer, index)
+function Scheme:Activate(doer, index)
 	local index = tonumber(index)
 	if not self:CheckConditionAndCost(doer, index) then return end
 
@@ -96,7 +96,7 @@ function scheme:Activate(doer, index)
 	end
 end
 
-function scheme:Teleport(obj, index)
+function Scheme:Teleport(obj, index)
 	local target = self:GetTarget(index)
 	local offset = 2.0
 	local angle = math.random() * 360
@@ -114,15 +114,15 @@ function scheme:Teleport(obj, index)
     end
 end
 
-function scheme:GetTarget(index)
+function Scheme:GetTarget(index)
 	return _G.TUNNELNETWORK[index] and _G.TUNNELNETWORK[index].inst
 end
 
-function scheme:IsConnected(index)
+function Scheme:IsConnected(index)
 	return self:GetTarget(index) ~= nil
 end
 
-function scheme:FindIndex()
+function Scheme:FindIndex()
 	local index = 1
 	while _G.TUNNELNETWORK[index] ~= nil do
 		index = index + 1
@@ -130,13 +130,13 @@ function scheme:FindIndex()
 	return index
 end
 
-function scheme:SetOwner(player)
+function Scheme:SetOwner(player)
 	if player.userid ~= nil then
 		self.owner = player.userid
 	end
 end
 
-function scheme:AddToNetwork()
+function Scheme:AddToNetwork()
 	local index = self.index ~= nil and self.index or self:FindIndex()
 
 	_G.TUNNELNETWORK[index] = {
@@ -147,24 +147,30 @@ function scheme:AddToNetwork()
 	self.inst.replica.taggable.index:set(index)
 end
 
-function scheme:Disconnect(index)
+function Scheme:Disconnect(index)
 	if _G.TUNNELNETWORK[index] ~= nil then
 		_G.TUNNELNETWORK[index] = nil
 		_G.NUMTUNNEL = _G.NUMTUNNEL - 1
 	end
 end
 
-function scheme:SelectDest(player)
+function Scheme:SelectDest(player)
 	self.inst:PushEvent("select", {user = player})
 
 	return true
 end
 
-function scheme:InitGate()
+function Scheme:InitGate()
 	self:AddToNetwork()
 	if _G.NUMTUNNEL > 1 then
 		self.inst.islinked:set(true)
 	end
 end
 
-return scheme
+function Scheme:CollectSceneActions(doer, actions, right)
+	if inst:HasTag("teleporter") then
+		table.insert(actions, ACTIONS.SELECTG)
+    end
+end
+
+return Scheme

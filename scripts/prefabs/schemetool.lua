@@ -21,12 +21,14 @@ local function fn()
 	
 	inst.entity:AddTransform()    
 	inst.entity:AddAnimState()    
-	inst.entity:AddNetwork()	
 	inst.entity:AddSoundEmitter() 
 	inst.entity:AddMiniMapEntity()
     inst.MiniMapEntity:SetIcon("schemetool.tex") 
 
 	MakeInventoryPhysics(inst)
+	if IsDLCEnabled(CAPY_DLC) then
+		MakeInventoryFloatable(inst, "idle", "idle")
+	end
 	
 	inst.AnimState:SetBank("schemetool")    
 	inst.AnimState:SetBuild("schemetool")    
@@ -34,14 +36,6 @@ local function fn()
 
 	inst:AddTag("scheme")
 	inst:AddTag("schemetool")
-	inst:AddTag("castontargets")
-	inst.canspell = net_bool(inst.GUID, "canspell")
-
-	inst.entity:SetPristine()
-
-	if not TheWorld.ismastersim then
-		return inst
-    end
 
 	inst:AddComponent("makegate")
 

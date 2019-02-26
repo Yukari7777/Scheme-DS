@@ -2,8 +2,7 @@ local Screen = require "widgets/screen"
 local Widget = require "widgets/widget"
 local Text = require "widgets/text"
 local TEMPLATES = require "widgets/redux/templates"
-local modname = KnownModIndex:GetModActualName("Scheme")
-local alter = GetModConfigData("alter", modname)
+local alter = _G.SCHEME_ALTERPREFAB
 
 local SchemeUI = Class(Screen, function(self, owner, attach)
     Screen._ctor(self, "SchemeUI")

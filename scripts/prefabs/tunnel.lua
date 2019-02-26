@@ -79,7 +79,6 @@ local function fn()
 	inst.entity:AddAnimState()    
 	inst.entity:AddSoundEmitter()  
 	inst.entity:AddMiniMapEntity()
-	inst.entity:AddNetwork()	
     
     inst.MiniMapEntity:SetIcon("minimap_tunnel.tex")
    
@@ -91,19 +90,11 @@ local function fn()
 
 	inst:AddTag("tunnel") 
 	inst:AddTag("teleporter")
-    inst:AddTag("_writeable")--Sneak these into pristine state for optimization
-	inst.islinked = net_bool(inst.GUID, "islinked")
-	
-	if not TheWorld.ismastersim then
-		return inst
-    end
-
-	inst.entity:SetPristine()
-	inst:RemoveTag("_writeable")
+	inst.islinked = false
 
 	inst:SetStateGraph("SGtunnel")
     inst:AddComponent("inspectable")
-	inst.components.inspectable.getspecialdescription = GetDesc
+	inst.components.inspectable.description = GetDesc
 
 	inst:AddComponent("taggable")
 
@@ -112,7 +103,6 @@ local function fn()
 	inst:AddComponent("inventory")
 
 	inst:AddComponent("trader")
-    inst.components.trader.acceptnontradable = true
     inst.components.trader.onaccept = onaccept
     inst.components.trader.deleteitemonaccept = false
 

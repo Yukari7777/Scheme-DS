@@ -42,6 +42,18 @@ STRINGS.CHARACTERS.WENDY.NODANGERSCHEME = "No time do that, death has finally co
 STRINGS.CHARACTERS.WAXWELL.NODANGERSCHEME = "That's a terrible idea right now."
 STRINGS.CHARACTERS.WATHGRITHR.NODANGERSCHEME = "Only a coward would leave now!"
 
+STRINGS.SIGNS = {
+	MENU =
+    {
+        PROMPT = "Write on the panel",
+        CANCEL = "Cancel",
+        ACCEPT = "Write it!",
+        REMOVE = "Remove",
+		REFRESH = "Refresh",
+        FILTERING = "Validating Message...",
+    },
+}
+
 if Language == "kr" then
 
 STRINGS.ACTION_SPAWNG = "스키마 게이트 소환"

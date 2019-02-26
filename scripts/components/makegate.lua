@@ -74,4 +74,24 @@ function MakeGate:Configurate(target, caster)
 	return true
 end
 
+function MakeGate:CollectEquippedActions(doer, target, actions, right)
+	if right and target:HasTag("tunnel")then
+		table.insert(actions, ACTIONS.CONFIGG)
+	end
+end
+
+function MakeGate:CollectPointActions(doer, pos, actions, right)
+    if right then
+		if inst.prefab == "yukariumbre" and doer:HasTag("yakumoyukari") and doer.components.power ~= nil then
+			if inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.SPAWNG_POWER_COST then
+				table.insert(actions, ACTIONS.SPAWNG)
+			elseif not inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.TELEPORT_POWER_COST then
+				table.insert(actions, ACTIONS.YTELE)
+			end
+		else
+			table.insert(actions, ACTIONS.SPAWNG)
+		end
+	end
+end
+
 return MakeGate
