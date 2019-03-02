@@ -10,6 +10,8 @@ local Menu = require "widgets/menu"
 local UIAnim = require "widgets/uianim"
 local ImageButton = require "widgets/imagebutton"
 
+local BUTTONFONT = "buttonfont"
+
 local function onaccept(inst, doer, widget)
     if not widget.isopen then
         return

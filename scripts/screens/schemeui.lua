@@ -1,7 +1,9 @@
 local Screen = require "widgets/screen"
 local Widget = require "widgets/widget"
 local Text = require "widgets/text"
-local TEMPLATES = require "widgets/redux/templates"
+local TEMPLATES = require "widgets/schemetemplates"
+
+local BODYTEXTFONT = "stint-ucr"
 local alter = _G.SCHEME_ALTERPREFAB
 
 local SchemeUI = Class(Screen, function(self, owner, attach)
@@ -26,7 +28,6 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
     self.inst:ListenForEvent("continuefrompause", function() if self.isopen then self.scalingroot:SetScale(TheFrontEnd:GetHUDScale()) end end, TheWorld)
     self.inst:ListenForEvent("refreshhudsize", function(hud, scale) if self.isopen then self.scalingroot:SetScale(scale) end end, owner.HUD.inst)
 
-	self.desttabledirty = {}
 	self.destdata = {}
 	self.destitem = {}
 
@@ -53,10 +54,7 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 	self.title:SetPosition(0, 155)
 
 	self.cancelbutton = self.destspanel:AddChild(TEMPLATES.StandardButton(function() self:OnCancel() end, STRINGS.SIGNS.MENU.CANCEL, {120, 40}))
-    self.cancelbutton:SetPosition(-80, -220)
-
-	self.refresh_button = self.destspanel:AddChild(TEMPLATES.StandardButton(function() self:Refresh() end, STRINGS.TAGGABLE_REFRESH_BUTTON, {120, 40}, {"images/button_icons.xml", "refresh.tex"}))
-	self.refresh_button:SetPosition(80, -220)
+    self.cancelbutton:SetPosition(0, -220)
 
 	if alter ~= "noalter" then
 		self.altericon = self.destspanel:AddChild(Image("images/inventoryimages.xml", alter..".tex"))
@@ -85,11 +83,9 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 end)
 
 function SchemeUI:Initialize()
-	self:Refresh()
-	self.inst:DoTaskInTime(1, function() --wait until serialized data to arrive to replica.
-		self:InitScroll()
-		self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
-	end)
+	self:UpdateData()
+	self:InitScroll()
+	self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
 end
 
 function SchemeUI:InitScroll()
@@ -141,7 +137,7 @@ end
 
 function SchemeUI:Deserialize()
 	if self.attach == nil then return end
-	local taggable = self.attach and self.attach.replica.taggable
+	local taggable = self.attach and self.attach.components.taggable
     local _serialized = taggable ~= nil and taggable._serializeddata:value()
     self.numalter = taggable ~= nil and taggable.numalter:value()
     self.numstat = taggable ~= nil and taggable.numstat:value()
@@ -162,24 +158,14 @@ function SchemeUI:Deserialize()
 	-- This has another meaning of dirty, which means not a sorted table.
 end
 
-function SchemeUI:Refresh()
-	SendModRPCToServer(MOD_RPC["scheme"]["serialize"], self.attach)
-	SendModRPCToServer(MOD_RPC["scheme"]["getcost"], false, self.attach)
-	self.inst:DoTaskInTime(0.5, function() --wait until serialized data to arrive to replica.
+function SchemeUI:UpdateData()
+	self.inst:DoTaskInTime(0.5, function() 
 		self:Deserialize()
-		local list = {}
-		for i, v in ipairs(self.desttabledirty) do 
-			local data = {
-				index = v["index"],
-				text = v["text"]
-			}
-
-			table.insert(list, data)
-		end
-		local taggable = self.attach and self.attach.replica.taggable
+		local list = _G.TUNNELNETWORK
+		local taggable = self.attach and self.attach.components.taggable
 		if taggable ~= nil then -- delete destination towards itself.	
 			for k, v in ipairs(list) do
-				if tonumber(list[k].index) == taggable.index:value() then	
+				if tonumber(list[k].index) == taggable.index then	
 					table.remove(list, k)
 				end
 			end
@@ -214,7 +200,7 @@ function SchemeUI:OnSelected(index)
         return
     end
 
-	local taggable = self.attach.replica.taggable
+	local taggable = self.attach.components.taggable
     if taggable ~= nil then
         taggable:DoAction(self.owner, nil, index)
     end
@@ -227,7 +213,7 @@ function SchemeUI:OnCancel()
         return
     end
 
-	local taggable = self.attach.replica.taggable
+	local taggable = self.attach.components.taggable
     if taggable ~= nil then
         taggable:DoAction(self.owner)
     end
@@ -254,7 +240,6 @@ function SchemeUI:Close()
 	if self.isopen then
         self.attach = nil
         self.black:Kill()
-		self.refresh_button:Kill()
         self.isopen = false
 
         self.inst:DoTaskInTime(.3, function() TheFrontEnd:PopScreen(self) end)

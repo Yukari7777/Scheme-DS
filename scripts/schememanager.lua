@@ -43,7 +43,7 @@ GLOBAL.GetGCost = function(player, isspawn, inst)
 		numalter = FindItemInSlots(player.replica.inventory:GetItems(), numalter)
 		for k, v in pairs(player.replica.inventory:GetEquips()) do
 			if type(v) == "table" and v.components.container ~= nil then
-				numalter = FindItemInSlots(player.replica.inventory:GetEquippedItem(k).components.container.slots, numalter)
+				numalter = FindItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, numalter)
 			end
 		end
 		numtouse = math.min(maxuse, numalter)
@@ -66,7 +66,7 @@ GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
 		leftoveritem = ConsumeItemInSlots(player.replica.inventory:GetItems(), leftoveritem)
 		for k, v in pairs(player.replica.inventory:GetEquips()) do
 			if type(v) == "table" and v.components.container ~= nil then
-				leftoveritem = ConsumeItemInSlots(player.replica.inventory:GetEquippedItem(k).components.container.slots, leftoveritem)
+				leftoveritem = ConsumeItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, leftoveritem)
 			end
 		end
 	end

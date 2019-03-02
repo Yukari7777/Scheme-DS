@@ -141,10 +141,11 @@ function Scheme:AddToNetwork()
 
 	_G.TUNNELNETWORK[index] = {
 		inst = self.inst,
+		index = self.index
 	}
 	_G.NUMTUNNEL = _G.NUMTUNNEL + 1
 	self.index = index
-	self.inst.replica.taggable.index:set(index)
+	self.inst.components.taggable.index = index
 end
 
 function Scheme:Disconnect(index)
