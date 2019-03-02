@@ -27,7 +27,7 @@ local function ConsumeItemInSlots(TheSlot, num)
 	return num
 end
 
-GLOBAL.GetGCost = function(player, isspawn, inst)
+GLOBAL.GetGCost = function(player, isspawn)
 	local _COST = isspawn and GetModConfigData("spawncost") or usecost
 	local maxuse = math.floor(_COST / altervalue)
 	local numalter = 0
@@ -40,8 +40,8 @@ GLOBAL.GetGCost = function(player, isspawn, inst)
 		leftover = isspawn and TUNING.YUKARI.SPAWNG_POWER_COST or player.components.upgrader.schemecost or 75
 		isyukari = true
 	elseif alterprefab ~= "noalter" then
-		numalter = FindItemInSlots(player.replica.inventory:GetItems(), numalter)
-		for k, v in pairs(player.replica.inventory:GetEquips()) do
+		numalter = FindItemInSlots(player.components.inventory:GetItems(), numalter)
+		for k, v in pairs(player.components.inventory:GetEquips()) do
 			if type(v) == "table" and v.components.container ~= nil then
 				numalter = FindItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, numalter)
 			end
@@ -50,21 +50,14 @@ GLOBAL.GetGCost = function(player, isspawn, inst)
 		leftover = leftover - numtouse * altervalue
 	end
 
-	if inst ~= nil then --If this called by RPC,
-		inst.replica.taggable.numalter:set(numtouse)
-		inst.replica.taggable.numstat:set(leftover)
-		inst.replica.taggable.isyukari:set(isyukari)
-	else
-		return numtouse, leftover
-	end
+	return numtouse, leftover
 end
-AddModRPCHandler("scheme", "getcost", GLOBAL.GetGCost)
 
 GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
 	local leftoveritem = numitem
 	if leftoveritem ~= 0 then
-		leftoveritem = ConsumeItemInSlots(player.replica.inventory:GetItems(), leftoveritem)
-		for k, v in pairs(player.replica.inventory:GetEquips()) do
+		leftoveritem = ConsumeItemInSlots(player.components.inventory:GetItems(), leftoveritem)
+		for k, v in pairs(player.components.inventory:GetEquips()) do
 			if type(v) == "table" and v.components.container ~= nil then
 				leftoveritem = ConsumeItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, leftoveritem)
 			end
@@ -97,23 +90,20 @@ end
 local function RemoveScheme(player, target)
 	local scheme = target.components.scheme
 	if scheme ~= nil then
-		if scheme.owner == player.userid or scheme.owner == nil then
-			if player ~= nil then
-				player.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
-			end
-
-			target:Remove()
+		if player ~= nil then
+			player.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
 		end
+
+		target:Remove()
 	end
 end
-AddModRPCHandler("scheme", "remove", RemoveScheme)
 
 local function SetTaggableText(player, target, text)
     local taggable = target.components.taggable
 	local scheme = target.components.scheme
     if taggable ~= nil then
 		if target.classified.shouldUI:value() then
-			taggable:EndAction()
+			taggable:CloseWidget()
 		else
 			taggable:DoAction(player, text)
 		end
@@ -123,7 +113,6 @@ local function SetTaggableText(player, target, text)
 		scheme:SetOwner(player)
 	end
 end
-AddModRPCHandler("scheme", "write", SetTaggableText)
 
 local function SerializeSchemeNetworkData(player, tunnel)
 	local list = {}
@@ -145,12 +134,10 @@ local function SerializeSchemeNetworkData(player, tunnel)
 		tunnel.replica.taggable._serializeddata:set(_serialized) 
 	end
 end
-AddModRPCHandler("scheme", "serialize", SerializeSchemeNetworkData)
 
 local function DoTeleportWithIndex(player, index, inst)
 	local taggable = inst.components.taggable
 	if taggable ~= nil then
-		taggable:DoAction(player, nil, index)
+		taggable:DoAction(player, index)
 	end
 end
-AddModRPCHandler("scheme", "teleport", DoTeleportWithIndex)

@@ -25,7 +25,7 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
     self.scalingroot = self:AddChild(Widget("schemeuiscalingroot"))
     self.scalingroot:SetScale(TheFrontEnd:GetHUDScale())
 
-    self.inst:ListenForEvent("continuefrompause", function() if self.isopen then self.scalingroot:SetScale(TheFrontEnd:GetHUDScale()) end end, TheWorld)
+    self.inst:ListenForEvent("continuefrompause", function() if self.isopen then self.scalingroot:SetScale(TheFrontEnd:GetHUDScale()) end end, GetWorld())
     self.inst:ListenForEvent("refreshhudsize", function(hud, scale) if self.isopen then self.scalingroot:SetScale(scale) end end, owner.HUD.inst)
 
 	self.destdata = {}
@@ -83,8 +83,8 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 end)
 
 function SchemeUI:Initialize()
-	self:UpdateData()
 	self:InitScroll()
+	self:MakeItem()
 	self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
 end
 
@@ -110,7 +110,7 @@ function SchemeUI:InitScroll()
 
 	local function ApplyDataToWidget(context, item, data, index)
 		if data ~= nil then
-			item.name:SetString(data.text)
+			item.name:SetString(data.text or "")
 			item.name:SetColour(1, 1, 1, 1)
 			item.button:SetOnClick(function() self:OnSelected(data.index) end)
 		else
@@ -135,64 +135,40 @@ function SchemeUI:InitScroll()
     self.scroll_list:SetFocusChangeDir(MOVE_DOWN, self.cancelbutton)
 end
 
-function SchemeUI:Deserialize()
-	if self.attach == nil then return end
+function SchemeUI:MakeItem()
+	local list = _G.TUNNELNETWORK
 	local taggable = self.attach and self.attach.components.taggable
-    local _serialized = taggable ~= nil and taggable._serializeddata:value()
-    self.numalter = taggable ~= nil and taggable.numalter:value()
-    self.numstat = taggable ~= nil and taggable.numstat:value()
 
-	--assert(not(_serialized == nil or _serialized == ""), "TUNNELNETWORK data deserialization failed. No data recieved.")
-	local _deserialized = {}
-	for i, v in ipairs(string.split(_serialized, "\n")) do
-		local elements = string.split(v, "\t")
-		--assert(elements[1] ~= tostring(i), "TUNNELNETWORK data deserialization failed. Serialized data has been malformed.")
+	if taggable ~= nil then
+		for k, v in ipairs(list) do
+			if tonumber(list[k].index) == taggable.index then	
+				table.remove(list, k) -- delete destination towards itself.	
+			end
+		end
 
-		local list = {}
-		list.index = elements[1]
-		list.text = elements[2]
-		_deserialized[i] = list
+		if GetPlayer():HasTag("yakumoyukari") then
+			self.staticon:SetTexture("images/inventoryimages/powerpanel.xml", "powerpanel.tex")
+			self.staticon:SetSize(35, 35)
+		end
 	end
 
-	self.desttabledirty = _deserialized
-	-- This has another meaning of dirty, which means not a sorted table.
-end
+	self.destdata = list
+	if self.scroll_list ~= nil then
+		self.scroll_list:SetItemsData(self.destdata)
+	end
 
-function SchemeUI:UpdateData()
-	self.inst:DoTaskInTime(0.5, function() 
-		self:Deserialize()
-		local list = _G.TUNNELNETWORK
-		local taggable = self.attach and self.attach.components.taggable
-		if taggable ~= nil then -- delete destination towards itself.	
-			for k, v in ipairs(list) do
-				if tonumber(list[k].index) == taggable.index then	
-					table.remove(list, k)
-				end
-			end
-
-			if taggable.isyukari:value() then -- for some reason, widget itself doesn't get enough information to have self.inst.prefab nor can do self.inst:HasTag(). So I have to do this.
-				self.staticon:SetTexture("images/inventoryimages/powerpanel.xml", "powerpanel.tex")
-				self.staticon:SetSize(35, 35)
-			end
-		end
-
-		self.destdata = list
-		if self.scroll_list ~= nil then
-			self.scroll_list:SetItemsData(self.destdata)
-		end
-
-		if self.numalter ~= 0 then
-			self.alternum:SetString(": "..self.numalter)
-			self.alternum:Show()
-			self.altericon:Show()
-		else
-			self.staticon:SetPosition(-110, -142)
-			self.sanitynum:SetPosition(-73, -142)
-		end
-		self.sanitynum:SetString(": "..self.numstat)
-		self.sanitynum:Show()
-		self.staticon:Show()
-	end)
+	self.numalter, self.numstat = _G.GetCost(self.owner)
+	if self.numalter ~= 0 then
+		self.alternum:SetString(": "..self.numalter)
+		self.alternum:Show()
+		self.altericon:Show()
+	else
+		self.staticon:SetPosition(-110, -142)
+		self.sanitynum:SetPosition(-73, -142)
+	end
+	self.sanitynum:SetString(": "..self.numstat)
+	self.sanitynum:Show()
+	self.staticon:Show()
 end
 
 function SchemeUI:OnSelected(index)
@@ -202,7 +178,7 @@ function SchemeUI:OnSelected(index)
 
 	local taggable = self.attach.components.taggable
     if taggable ~= nil then
-        taggable:DoAction(self.owner, nil, index)
+        taggable:Teleport(self.owner, index)
     end
 
     self.owner.HUD:CloseSchemeUI()
@@ -215,9 +191,8 @@ function SchemeUI:OnCancel()
 
 	local taggable = self.attach.components.taggable
     if taggable ~= nil then
-        taggable:DoAction(self.owner)
+        taggable:CloseWidget()
     end
-	SendModRPCToServer(MOD_RPC["scheme"]["getcost"], true, self.attach)
 
     self.owner.HUD:CloseSchemeUI()
 end

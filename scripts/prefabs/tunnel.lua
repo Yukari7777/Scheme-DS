@@ -10,13 +10,11 @@ local important_prefabs = {
 
 local function onsave(inst, data)
 	data.index = inst.components.scheme.index
-	data.owner = inst.components.scheme.owner
 end
 
 local function onload(inst, data)
 	if data ~= nil then
 		inst.components.scheme.index = data.index
-		inst.components.scheme.owner = data.owner
 		inst.components.scheme:InitGate()
 	end
 end
@@ -29,14 +27,14 @@ local function onremove(inst)
 end
 
 local function GetDesc(inst, viewer)
-	local index = inst.components.scheme.index or "ERROR"
+	local index = inst.components.scheme.index or -1
 	local text = inst.components.taggable:GetText() or "#"..index
 
 	if text == "#1" and _G.NUMTUNNEL == 1 then
 		return GetDescription(viewer, inst)
 	end
 
-	return string.format( text )
+	return string.format(text)
 end
 
 local function IsImportantItem(item)
@@ -103,8 +101,7 @@ local function fn()
 	inst:AddComponent("inventory")
 
 	inst:AddComponent("trader")
-    inst.components.trader.onaccept = onaccept
-    inst.components.trader.deleteitemonaccept = false
+    inst.components.trader.AcceptGift = onaccept
 
 	inst.OnSave = onsave
 	inst.OnLoad = onload

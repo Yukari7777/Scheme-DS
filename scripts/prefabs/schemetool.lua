@@ -16,7 +16,6 @@ local function onunequip(inst, owner)
 end
 
 local function fn()  
-
 	local inst = CreateEntity() 
 	
 	inst.entity:AddTransform()    

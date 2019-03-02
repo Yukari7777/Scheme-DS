@@ -1,7 +1,5 @@
 local taggables = require"taggables"
 
---V2C: NOTE: do not add "writeable" tag to pristine state because it is more
---           likely for players to encounter signs that are already written.
 local Taggable = Class(function(self, inst)
     self.inst = inst
     self.text = nil
@@ -9,13 +7,13 @@ local Taggable = Class(function(self, inst)
     self.screen = nil
 	
     self.onclosepopups = function()
-		self:EndAction()
+		self:CloseWidget()
     end
 
     self.generatorfn = nil
 
     self.inst:ListenForEvent("tag", self.BeginWriting)
-    self.inst:ListenForEvent("select", onselected)
+    self.inst:ListenForEvent("select", self.SelectPopup)
 end)
 
 function Taggable:OnSave()
@@ -44,14 +42,11 @@ end
 
 function Taggable:SetText(text)
     self.text = text
+	_G.TUNNELNETWORK[self.inst.components.scheme.index].text = text
 end
 
 function Taggable:BeginWriting(doer)
     self.inst:StartUpdatingComponent(self)
-
-    self.writer = doer
---  self.inst:ListenForEvent("ms_closepopups", self.onclosepopups, doer)
---  self.inst:ListenForEvent("onremove", self.onclosepopups, doer)
 
     self.screen = taggables.makescreen(self.inst, doer)
 end
@@ -83,7 +78,7 @@ local function IsNearDanger(inst)
 	local isdanger = false
 	if not _G.SCHEME_IGNOREDANGER then
 		local x, y, z = inst.Transform:GetWorldPosition()
-		local ents = TheSim:FindEntities(x, y, z, DANGER_RADIUS, { "_combat" }, { "shadowcreature" }) -- See entityreplica.lua (for _combat tag usage)
+		local ents = TheSim:FindEntities(x, y, z, DANGER_RADIUS, nil, { "shadowcreature" })
 
 		if ents ~= nil then
 			if inst:HasTag("realyoukai") then
@@ -130,13 +125,13 @@ local function IsNearDanger(inst)
 			end
 		end
 
-		local hounded = TheWorld.components.hounded
-		if hounded ~= nil and (hounded:GetWarning() or hounded:GetAttacking()) then
-			isdanger = true
+		local hounded = GetWorld().components.hounded
+		if hounded ~= nil then
+			isdanger = hounded.warning
 		end
 
 		local burnable = inst.components.burnable
-		if burnable ~= nil and (burnable:IsBurning() or burnable:IsSmoldering()) then
+		if burnable ~= nil and (burnable:IsBurning() or (burnable.IsSmoldering ~= nil and burnable:IsSmoldering())) then
 			isdanger = true
 		end
 
@@ -165,7 +160,20 @@ function Taggable:IsWritten()
     return self.text ~= nil
 end
 
-function Taggable:DoAction(doer, _text, index) --Some.. bad example of implementing overload
+function Taggable:Write(doer, text)
+	local text = text or self.text
+	if text == nil or text == "" then --set default text
+		local index = self.inst.components.scheme.index
+		if index ~= nil then
+			text = "#"..index
+		end
+	end
+
+	self:SetText(text)
+	self:CloseWidget()
+end
+
+function Taggable:Teleport(doer, index) --Some.. bad example of implementing overload
 	if index ~= nil then
 		doer.sg:GoToState("jumpin", { teleporter = doer })
 		doer:DoTaskInTime(0.8, function()
@@ -183,56 +191,32 @@ function Taggable:DoAction(doer, _text, index) --Some.. bad example of implement
 				end
 			end
 		end)
-	else
-		local text = _text or self.text
-		if text == nil or text == "" then --set default text
-			local index = self.inst.components.scheme.index
-			if index ~= nil then
-				text = "#"..index
-			end
-		end
-
-		self:SetText(text)
 	end
 
-	self:EndAction()
+	self:CloseWidget()
 end
 
-function Taggable:EndAction()
-    if self.writer ~= nil then
-        self.inst:StopUpdatingComponent(self)
+function Taggable:Remove(doer)
+	_G.RemoveScheme(doer, self.inst)
+end
 
-        if self.screen ~= nil then
-            self.writer.HUD:CloseTaggableWidget()
-            self.writer.HUD:CloseSchemeUI()
-            self.screen = nil
-        end
+function Taggable:CloseWidget()
+    self.inst:StopUpdatingComponent(self)
 
-        self.inst:RemoveEventCallback("ms_closepopups", self.onclosepopups, self.writer)
-        self.inst:RemoveEventCallback("onremove", self.onclosepopups, self.writer)
+    if self.screen ~= nil then
+        GetPlayer().HUD:CloseTaggableWidget()
+        GetPlayer().HUD:CloseSchemeUI()
+        self.screen = nil
+    end
 
---		if IsXB1() then
---			if self.writer:HasTag("player") and self.writer:GetDisplayName() then
---				local ClientObjs = TheNet:GetClientTable()
---				if ClientObjs ~= nil and #ClientObjs > 0 then
---					for i, v in ipairs(ClientObjs) do
---						if self.writer:GetDisplayName() == v.name then
---							self.netid = v.netid
---							break
---						end
---					end
---				end
---			end
---		end
-
-        self.writer = nil
-    elseif self.screen ~= nil then
+    if self.screen ~= nil then
         --Should not have screen and no writer, but just in case...
         if self.screen.inst:IsValid() then
             self.screen:Kill()
         end
         self.screen = nil
     end
+
 	self.inst:DoTaskInTime(1, function()
 		self.inst.sg:GoToState("closing")
 	end)
@@ -243,25 +227,20 @@ end
 --------------------------------------------------------------------------
 
 function Taggable:OnUpdate(dt)
-    if self.writer == nil then
-        self.inst:StopUpdatingComponent(self)
-    elseif (self.writer.components.rider ~= nil and
-        self.writer.components.rider:IsRiding())
-        or not (self.writer:IsNear(self.inst, 3) and
-		CanEntitySeeTarget(self.writer, self.inst)) then
-			self:EndAction()
+    if not (CanEntitySeeTarget(GetPlayer(), self.inst) or IsNearDanger(GetPlayer())) then
+		self:CloseWidget()
     end
 end
 
 --------------------------------------------------------------------------
 
 function Taggable:OnRemoveFromEntity()
-    self:EndAction()
+    self:CloseWidget()
     self.inst:RemoveTag("writeable")
     self.inst:RemoveEventCallback("tag", onspawned)
 	self.inst:RemoveEventCallback("select", onselected)
 end
 
-Taggable.OnRemoveEntity = Taggable.EndAction
+Taggable.OnRemoveEntity = Taggable.CloseWidget
 
 return Taggable

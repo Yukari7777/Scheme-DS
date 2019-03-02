@@ -37,8 +37,6 @@ require "class"
 
 AddMinimapAtlas("images/map_icons/minimap_tunnel.xml")
 AddMinimapAtlas("images/map_icons/schemetool.xml")
-AddReplicableComponent("taggable")
-
 ------ Functions ------
 
 local Language =  GetModConfigData("language")

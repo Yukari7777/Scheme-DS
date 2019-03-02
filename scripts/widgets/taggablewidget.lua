@@ -19,17 +19,17 @@ local function onaccept(inst, doer, widget)
     -- print("OnAccept",inst,doer,widget)
 
     --strip leading/trailing whitespace
-    local msg = widget:GetText()
-    local processed_msg = msg:match("^%s*(.-%S)%s*$") or ""
-    if msg ~= processed_msg or #msg <= 0 then
+    local text = widget:GetText()
+    local processed_msg = text:match("^%s*(.-%S)%s*$") or ""
+    if text ~= processed_msg or #text <= 0 then
         widget.edit_text:SetString(processed_msg)
         widget.edit_text:SetEditing(true)
         return
     end
 
-    local taggable = inst.replica.taggable
+    local taggable = inst.components.taggable
     if taggable ~= nil then
-        taggable:DoAction(doer, msg)
+        taggable:Write(doer, text)
     end
 
     if widget.config.acceptbtn.cb ~= nil then
@@ -45,7 +45,7 @@ local function onmiddle(inst, doer, widget)
     end
     --print("OnMiddle",inst,doer,widget)
 
-	local taggable = inst.replica.taggable
+	local taggable = inst.components.taggable
     if taggable ~= nil then
         taggable:Remove(doer)
     end
@@ -59,9 +59,9 @@ local function oncancel(inst, doer, widget)
     end
     --print("OnCancel",inst,doer,widget)
 
-    local taggable = inst.replica.taggable
+    local taggable = inst.components.taggable
     if taggable ~= nil then
-        taggable:DoAction(doer)
+        taggable:CloseWidget()
     end
 
     if widget.config.cancelbtn.cb ~= nil then
@@ -94,7 +94,7 @@ local TaggableWidget = Class(Screen, function(self, owner, taggable, config)
         if self.isopen then
             self.scalingroot:SetScale(TheFrontEnd:GetHUDScale())
         end
-    end, TheWorld)
+    end, GetWorld())
     self.inst:ListenForEvent("refreshhudsize", function(hud, scale)
         if self.isopen then
             self.scalingroot:SetScale(scale)
@@ -194,12 +194,6 @@ local TaggableWidget = Class(Screen, function(self, owner, taggable, config)
     else
         self.root:SetPosition(0, 150, 0)
     end
-
-    --if config.buttoninfo ~= nil then
-        --if doer ~= nil and doer.components.playeractionpicker ~= nil then
-            --doer.components.playeractionpicker:RegisterContainer(container)
-        --end
-    --end
 
     self.isopen = true
     self:Show()
