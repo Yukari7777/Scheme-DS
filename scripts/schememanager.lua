@@ -41,7 +41,7 @@ GLOBAL.GetGCost = function(player, isspawn)
 		isyukari = true
 	elseif alterprefab ~= "noalter" then
 		numalter = FindItemInSlots(player.components.inventory:GetItems(), numalter)
-		for k, v in pairs(player.components.inventory:GetEquips()) do
+		for k, v in pairs(player.components.inventory.itemslots) do
 			if type(v) == "table" and v.components.container ~= nil then
 				numalter = FindItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, numalter)
 			end
@@ -57,7 +57,7 @@ GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
 	local leftoveritem = numitem
 	if leftoveritem ~= 0 then
 		leftoveritem = ConsumeItemInSlots(player.components.inventory:GetItems(), leftoveritem)
-		for k, v in pairs(player.components.inventory:GetEquips()) do
+		for k, v in pairs(player.components.inventory.itemslots) do
 			if type(v) == "table" and v.components.container ~= nil then
 				leftoveritem = ConsumeItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, leftoveritem)
 			end
@@ -105,7 +105,7 @@ local function SetTaggableText(player, target, text)
 		if target.classified.shouldUI:value() then
 			taggable:CloseWidget()
 		else
-			taggable:DoAction(player, text)
+			taggable:Write(player, text)
 		end
     end
 
@@ -114,30 +114,9 @@ local function SetTaggableText(player, target, text)
 	end
 end
 
-local function SerializeSchemeNetworkData(player, tunnel)
-	local list = {}
-	local _serialized
-
-	for _, v in pairs(GLOBAL.TUNNELNETWORK) do
-		if v.inst ~= nil then
-			local index = v.inst.components.scheme.index
-			local text = v.inst.components.taggable.text
-			if text == nil then
-				text = "#"..v.inst.components.scheme.index
-			end
-			table.insert(list, index.."\t"..text)
-		end
-	end
-
-	_serialized = table.concat(list, "\n")
-	if tunnel ~= nil then
-		tunnel.replica.taggable._serializeddata:set(_serialized) 
-	end
-end
-
 local function DoTeleportWithIndex(player, index, inst)
 	local taggable = inst.components.taggable
 	if taggable ~= nil then
-		taggable:DoAction(player, index)
+		taggable:Write(player, index)
 	end
 end

@@ -82,10 +82,10 @@ end
 
 function MakeGate:CollectPointActions(doer, pos, actions, right)
     if right then
-		if inst.prefab == "yukariumbre" and doer:HasTag("yakumoyukari") and doer.components.power ~= nil then
-			if inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.SPAWNG_POWER_COST then
+		if self.inst.prefab == "yukariumbre" and doer:HasTag("yakumoyukari") and doer.components.power ~= nil then
+			if self.inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.SPAWNG_POWER_COST then
 				table.insert(actions, ACTIONS.SPAWNG)
-			elseif not inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.TELEPORT_POWER_COST then
+			elseif not self.inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.TELEPORT_POWER_COST then
 				table.insert(actions, ACTIONS.YTELE)
 			end
 		else

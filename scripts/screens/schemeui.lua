@@ -4,7 +4,6 @@ local Text = require "widgets/text"
 local TEMPLATES = require "widgets/schemetemplates"
 
 local BODYTEXTFONT = "stint-ucr"
-local alter = _G.SCHEME_ALTERPREFAB
 
 local SchemeUI = Class(Screen, function(self, owner, attach)
     Screen._ctor(self, "SchemeUI")
@@ -56,6 +55,7 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 	self.cancelbutton = self.destspanel:AddChild(TEMPLATES.StandardButton(function() self:OnCancel() end, STRINGS.SIGNS.MENU.CANCEL, {120, 40}))
     self.cancelbutton:SetPosition(0, -220)
 
+	local alter = _G.SCHEME_ALTERPREFAB
 	if alter ~= "noalter" then
 		self.altericon = self.destspanel:AddChild(Image("images/inventoryimages.xml", alter..".tex"))
 		self.altericon:SetPosition(-110, -142)

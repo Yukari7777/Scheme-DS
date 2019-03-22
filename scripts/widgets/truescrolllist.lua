@@ -89,7 +89,7 @@ function TrueScrollList:DebugDraw_AddSection(dbui, panel)
 
     local force_reposition = false
     if self.scissor_preview.image == nil then
-        self.scissor_preview.image = self.scissored_root:AddChild(Image("images/ui.xml", "white.tex"))
+        self.scissor_preview.image = self.scissored_root:AddChild(Image("images/ui.xml", "white.tex")) -- ****
         self.scissor_preview.image:SetSize(self.scissor_preview.width, self.scissor_preview.height)
         self.scissor_preview.image:Hide()
         force_reposition = true
@@ -180,7 +180,7 @@ function TrueScrollList:BuildScrollBar()
     self.scroll_bar_line:SetPosition(0, 0)
 
 	--self.scroll_bar is used just for clicking on it
-    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButton("images/ui.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0}))
+    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButton("images/ui.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0})) -- ****
     self.scroll_bar.image:ScaleToSize(32, line_height)
     self.scroll_bar.image:SetTint(1,1,1,0)
     self.scroll_bar.scale_on_focus = false

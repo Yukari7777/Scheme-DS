@@ -2,11 +2,14 @@
 -- Most of these contents are pure copy-pasted of DST.
 
 local Widget = require "widgets/widget"
+local Image = require "widgets/image"
 local NineSlice = require "widgets/nineslice"
 local ImageButton = require "widgets/imagebutton"
 local TrueScrollList = require "widgets/truescrolllist"
 
 local CHATFONT = "bellefair"
+
+TEMPLATES = {}
 
 function TEMPLATES.ScreenRoot(name)
     local root = Widget(name or "root")
