@@ -164,12 +164,12 @@ end
 function Scheme:InitGate()
 	self:AddToNetwork()
 	if _G.NUMTUNNEL > 1 then
-		self.inst.islinked:set(true)
+		self.inst.islinked = true
 	end
 end
 
 function Scheme:CollectSceneActions(doer, actions, right)
-	if inst:HasTag("teleporter") then
+	if self.inst:HasTag("teleporter") then
 		table.insert(actions, ACTIONS.SELECTG)
     end
 end

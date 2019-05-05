@@ -26,7 +26,7 @@ local require = GLOBAL.require
 local TECH = GLOBAL.TECH
 local RECIPETABS = GLOBAL.RECIPETABS
 local TheFrontEnd = GLOBAL.TheFrontEnd
-local TaggableWidget = require "widgets/taggablewidget"
+local TagScreen = require "screens/tagscreen"
 local SchemeUI = require "screens/schemeui"
 GLOBAL.SCHEME_MODNAME = GLOBAL.KnownModIndex:GetModActualName("Scheme")
 GLOBAL.SCHEME_IGNOREDANGER = GetModConfigData("ignoredanger")
@@ -58,6 +58,7 @@ else
 end
 
 AddClassPostConstruct("screens/playerhud", function(self, anim, owner)
+--[[
 	self.ShowTaggableWidget = function(self, taggable, config)
 		if taggable == nil then
 			return
@@ -95,6 +96,7 @@ AddClassPostConstruct("screens/playerhud", function(self, anim, owner)
 			self.schemescreen = nil
 		end
 	end
+]]--
 end)
 
 TUNING.SCHEMETOOL_USES = 36

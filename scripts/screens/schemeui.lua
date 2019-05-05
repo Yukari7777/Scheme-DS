@@ -8,6 +8,9 @@ local BODYTEXTFONT = "stint-ucr"
 local SchemeUI = Class(Screen, function(self, owner, attach)
     Screen._ctor(self, "SchemeUI")
 
+	SetPause(true, "SchemeUI")
+	TheInput:EnableDebugToggle(false)
+
     self.owner = owner
     self.attach = attach
 
@@ -23,9 +26,6 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 
     self.scalingroot = self:AddChild(Widget("schemeuiscalingroot"))
     self.scalingroot:SetScale(TheFrontEnd:GetHUDScale())
-
-    self.inst:ListenForEvent("continuefrompause", function() if self.isopen then self.scalingroot:SetScale(TheFrontEnd:GetHUDScale()) end end, GetWorld())
-    self.inst:ListenForEvent("refreshhudsize", function(hud, scale) if self.isopen then self.scalingroot:SetScale(scale) end end, owner.HUD.inst)
 
 	self.destdata = {}
 	self.destitem = {}
@@ -191,7 +191,7 @@ function SchemeUI:OnCancel()
 
 	local taggable = self.attach.components.taggable
     if taggable ~= nil then
-        taggable:CloseWidget()
+        taggable:OnCloseWidget()
     end
 
     self.owner.HUD:CloseSchemeUI()

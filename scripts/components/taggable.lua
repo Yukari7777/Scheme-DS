@@ -1,55 +1,5 @@
-local taggables = require"taggables"
-
-local Taggable = Class(function(self, inst)
-    self.inst = inst
-    self.text = nil
-
-    self.screen = nil
-	
-    self.onclosepopups = function()
-		self:CloseWidget()
-    end
-
-    self.generatorfn = nil
-
-    self.inst:ListenForEvent("tag", self.BeginWriting)
-    self.inst:ListenForEvent("select", self.SelectPopup)
-end)
-
-function Taggable:OnSave()
-    local data = {}
-
-    data.text = self.text
-
-    return data
-end
-
-function Taggable:OnLoad(data)
-    self.text = data.text
-	if IsXB1() then
-		self.netid = data.netid
-	end
-end
-
-function Taggable:GetText(viewer)
-	if IsXB1() then
-		if self.text and self.netid then
-			return "\1"..self.text.."\1"..self.netid
-		end
-	end
-    return self.text
-end
-
-function Taggable:SetText(text)
-    self.text = text
-	_G.TUNNELNETWORK[self.inst.components.scheme.index].text = text
-end
-
-function Taggable:BeginWriting(doer)
-    self.inst:StartUpdatingComponent(self)
-
-    self.screen = taggables.makescreen(self.inst, doer)
-end
+local taggables = require "taggables"
+local TagScreen = require "screens/tagscreen"
 
 local DANGER_RADIUS = 10
 local function IsInDangerFromShadowCreatures(inst)
@@ -141,6 +91,55 @@ local function IsNearDanger(inst)
 	return isdanger or isnearbosses
 end
 
+local Taggable = Class(function(self, inst)
+    self.inst = inst
+    self.text = nil
+	
+    self.inst:ListenForEvent("tag", self.BeginWriting)
+    self.inst:ListenForEvent("select", self.SelectPopup)
+end)
+
+function Taggable:OnSave()
+    local data = {}
+
+    data.text = self.text
+
+    return data
+end
+
+function Taggable:OnLoad(data)
+    self.text = data.text
+	if IsXB1() then
+		self.netid = data.netid
+	end
+end
+
+function Taggable:OnCloseWidget()
+	self.inst.sg:GoToState("closing")
+end
+
+function Taggable:GetText(viewer)
+	if IsXB1() then
+		if self.text and self.netid then
+			return "\1"..self.text.."\1"..self.netid
+		end
+	end
+    return self.text
+end
+
+function Taggable:SetText(text)
+    self.text = text
+	_G.TUNNELNETWORK[self.inst.components.scheme.index].text = text
+end
+
+function Taggable:IsWritten()
+    return self.text ~= nil
+end
+
+function Taggable:BeginWriting(doer)
+    TheFrontEnd:PushScreen(TagScreen(self))
+end
+
 function Taggable:SelectPopup(doer)
 	if IsNearDanger(doer) then 
 		doer.components.talker:Say(GetString(doer.prefab, "NODANGERSCHEME"))
@@ -148,16 +147,9 @@ function Taggable:SelectPopup(doer)
 	end
 	self.inst.sg:GoToState("opening")
 
---    self.inst:ListenForEvent("ms_closepopups", self.onclosepopups, doer)
---    self.inst:ListenForEvent("onremove", self.onclosepopups, doer)
 	doer:DoTaskInTime(14 * FRAMES, function()
-		self.inst:StartUpdatingComponent(self)
-		self.screen = doer.HUD:ShowSchemeUI(self.inst)
+		--TheFrontEnd:PushScreen(TaggableWidget(self))
 	end)
-end
-
-function Taggable:IsWritten()
-    return self.text ~= nil
 end
 
 function Taggable:Write(doer, text)
@@ -170,14 +162,14 @@ function Taggable:Write(doer, text)
 	end
 
 	self:SetText(text)
-	self:CloseWidget()
 end
 
-function Taggable:Teleport(doer, index) --Some.. bad example of implementing overload
+function Taggable:Teleport(doer, index)
 	if index ~= nil then
 		doer.sg:GoToState("jumpin", { teleporter = doer })
 		doer:DoTaskInTime(0.8, function()
 			self.inst.components.scheme:Activate(doer, index)
+			self.inst.sg:GoToState("closing")
 		end)
 		doer:DoTaskInTime(3, function() -- Move entities outside of map border inside
 			if not doer:IsOnValidGround() then
@@ -192,55 +184,26 @@ function Taggable:Teleport(doer, index) --Some.. bad example of implementing ove
 			end
 		end)
 	end
-
-	self:CloseWidget()
 end
 
 function Taggable:Remove(doer)
-	_G.RemoveScheme(doer, self.inst)
+	local scheme = self.inst.components.scheme
+
+	if scheme ~= nil then
+		if doer ~= nil then
+			doer.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
+		end
+
+		self.inst:Remove()
+	end
 end
-
-function Taggable:CloseWidget()
-    self.inst:StopUpdatingComponent(self)
-
-    if self.screen ~= nil then
-        GetPlayer().HUD:CloseTaggableWidget()
-        GetPlayer().HUD:CloseSchemeUI()
-        self.screen = nil
-    end
-
-    if self.screen ~= nil then
-        --Should not have screen and no writer, but just in case...
-        if self.screen.inst:IsValid() then
-            self.screen:Kill()
-        end
-        self.screen = nil
-    end
-
-	self.inst:DoTaskInTime(1, function()
-		self.inst.sg:GoToState("closing")
-	end)
-end
-
---------------------------------------------------------------------------
---Check for auto-closing conditions
---------------------------------------------------------------------------
-
-function Taggable:OnUpdate(dt)
-    if not (CanEntitySeeTarget(GetPlayer(), self.inst) or IsNearDanger(GetPlayer())) then
-		self:CloseWidget()
-    end
-end
-
---------------------------------------------------------------------------
 
 function Taggable:OnRemoveFromEntity()
-    self:CloseWidget()
     self.inst:RemoveTag("writeable")
     self.inst:RemoveEventCallback("tag", onspawned)
 	self.inst:RemoveEventCallback("select", onselected)
 end
 
-Taggable.OnRemoveEntity = Taggable.CloseWidget
+Taggable.OnRemoveEntity = Taggable.OnCloseWidget
 
 return Taggable

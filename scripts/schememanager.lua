@@ -87,23 +87,12 @@ GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
 	end
 end
 
-local function RemoveScheme(player, target)
-	local scheme = target.components.scheme
-	if scheme ~= nil then
-		if player ~= nil then
-			player.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
-		end
-
-		target:Remove()
-	end
-end
-
 local function SetTaggableText(player, target, text)
     local taggable = target.components.taggable
 	local scheme = target.components.scheme
     if taggable ~= nil then
 		if target.classified.shouldUI:value() then
-			taggable:CloseWidget()
+			taggable:OnCloseWidget()
 		else
 			taggable:Write(player, text)
 		end
