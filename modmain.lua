@@ -16,6 +16,15 @@ Assets = {
 	Asset( "IMAGE", "images/inventoryimages/powerpanel.tex" ),
 	Asset( "ATLAS", "images/inventoryimages/powerpanel.xml" ),
 
+	Asset( "IMAGE", "images/dialogcurly_9slice.tex" ),
+	Asset( "ATLAS", "images/dialogcurly_9slice.xml" ),
+	Asset( "IMAGE", "images/dialogrect_9slice.tex" ),
+	Asset( "ATLAS", "images/dialogrect_9slice.xml" ),
+	Asset( "IMAGE", "images/frontend_redux.tex" ),
+	Asset( "ATLAS", "images/frontend_redux.xml" ),
+	Asset( "IMAGE", "images/global_redux.tex" ),
+	Asset( "ATLAS", "images/global_redux.xml" ),
+
 	Asset( "ANIM" , "anim/ui_board_5x1.zip"),
 	Asset( "ANIM" , "anim/swap_schemetool.zip"),
 	Asset( "ANIM" , "anim/schemetool.zip"),

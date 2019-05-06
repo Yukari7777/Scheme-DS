@@ -40,7 +40,7 @@ local TrueScrollList = Class(Widget, function(self, context, create_widgets_fn, 
     self.bg:ScaleToSize(scissor_width, scissor_height)
 
 	self.scissored_root = self:AddChild(Widget("scissored_root"))
-    self.scissored_root:SetScissor(scissor_x, scissor_y, scissor_width, scissor_height)
+    self.scissored_root.inst.UITransform:SetScissor(scissor_x, scissor_y, scissor_width, scissor_height)
     if DEBUG_MODE then
         self.scissor_preview = {
             x = scissor_x,
@@ -220,8 +220,6 @@ function TrueScrollList:BuildScrollBar()
         self:RefreshView() --refresh again after we've been moved back to the "up-click" position in Button:OnControl
     end)
 end
-
-
 
 function TrueScrollList:DoDragScroll()
     --Check if we're near the scroll bar

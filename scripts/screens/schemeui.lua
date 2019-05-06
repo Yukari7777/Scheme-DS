@@ -1,31 +1,14 @@
 local Screen = require "widgets/screen"
 local Widget = require "widgets/widget"
 local Text = require "widgets/text"
+local ImageButton = require "widgets/imagebutton"
 local TEMPLATES = require "widgets/schemetemplates"
 
-local BODYTEXTFONT = "stint-ucr"
-
-local SchemeUI = Class(Screen, function(self, owner, attach)
+local SchemeUI = Class(Screen, function(self, attach)
     Screen._ctor(self, "SchemeUI")
 
-	SetPause(true, "SchemeUI")
-	TheInput:EnableDebugToggle(false)
-
-    self.owner = owner
+    self.owner = GetPlayer()
     self.attach = attach
-
-    self.isopen = false
-
-    self._scrnw, self._scrnh = TheSim:GetScreenSize()
-
-    self:SetScaleMode(SCALEMODE_PROPORTIONAL)
-    self:SetMaxPropUpscale(MAX_HUD_SCALE)
-    self:SetPosition(0, 0, 0)
-    self:SetVAnchor(ANCHOR_MIDDLE)
-    self:SetHAnchor(ANCHOR_MIDDLE)
-
-    self.scalingroot = self:AddChild(Widget("schemeuiscalingroot"))
-    self.scalingroot:SetScale(TheFrontEnd:GetHUDScale())
 
 	self.destdata = {}
 	self.destitem = {}
@@ -33,28 +16,35 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 	self.numalter = 0
 	self.numstat = 0
 
-    self.root = self.scalingroot:AddChild(TEMPLATES.ScreenRoot("root"))
+    self.root = self:AddChild(Widget("ROOT"))
+    self.root:SetVAnchor(ANCHOR_MIDDLE)
+    self.root:SetHAnchor(ANCHOR_MIDDLE)
+    self.root:SetPosition(0, 0, 0)
+    self.root:SetScaleMode(SCALEMODE_PROPORTIONAL)
 
-    -- secretly this thing is a modal Screen, it just LOOKS like a widget
     self.black = self.root:AddChild(Image("images/global.xml", "square.tex"))
     self.black:SetVRegPoint(ANCHOR_MIDDLE)
     self.black:SetHRegPoint(ANCHOR_MIDDLE)
     self.black:SetVAnchor(ANCHOR_MIDDLE)
     self.black:SetHAnchor(ANCHOR_MIDDLE)
     self.black:SetScaleMode(SCALEMODE_FILLSCREEN)
-    self.black:SetTint(0, 0, 0, 0)
+    self.black:SetTint(0, 0, 0, 0.5)
     self.black.OnMouseButton = function() self:OnCancel() end
 
     self.destspanel = self.root:AddChild(TEMPLATES.RectangleWindow(240, 360))
     self.destspanel:SetPosition(0, 25)
-
+	
 	self.title = self.destspanel:AddChild(Text(BODYTEXTFONT, 32))
 	self.title:SetString(STRINGS.TAGGABLE_SELECT_DESTINATION)
 	self.title:SetPosition(0, 155)
-
-	self.cancelbutton = self.destspanel:AddChild(TEMPLATES.StandardButton(function() self:OnCancel() end, STRINGS.SIGNS.MENU.CANCEL, {120, 40}))
-    self.cancelbutton:SetPosition(0, -220)
-
+	
+	self.cancelbutton = self.root:AddChild(ImageButton())
+    self.cancelbutton.image:SetScale(0.7)
+    self.cancelbutton:SetText(STRINGS.SIGNS.MENU.CANCEL)
+    self.cancelbutton:SetFont(BUTTONFONT)
+    self.cancelbutton:SetPosition(0, -160, 0)
+    self.cancelbutton:SetOnClick(function() self:OnCancel() end)
+	
 	local alter = _G.SCHEME_ALTERPREFAB
 	if alter ~= "noalter" then
 		self.altericon = self.destspanel:AddChild(Image("images/inventoryimages.xml", alter..".tex"))
@@ -75,17 +65,22 @@ local SchemeUI = Class(Screen, function(self, owner, attach)
 	self.sanitynum = self.destspanel:AddChild(Text(BODYTEXTFONT, 20))
 	self.sanitynum:SetPosition(-3, -145)
 	self.sanitynum:Hide()
-
+	
 	self:Initialize()
     self:Show()
     self.default_focus = self.scroll_list
-    self.isopen = true
 end)
+
+function SchemeUI:OnBecomeActive()
+    SchemeUI._base.OnBecomeActive(self)
+	SetPause(true, "SchemeUI")
+	TheInput:EnableDebugToggle(false)
+end
 
 function SchemeUI:Initialize()
 	self:InitScroll()
 	self:MakeItem()
-	self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
+	--self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
 end
 
 function SchemeUI:InitScroll()
@@ -172,29 +167,21 @@ function SchemeUI:MakeItem()
 end
 
 function SchemeUI:OnSelected(index)
-    if not self.isopen then
-        return
-    end
-
 	local taggable = self.attach.components.taggable
     if taggable ~= nil then
         taggable:Teleport(self.owner, index)
     end
 
-    self.owner.HUD:CloseSchemeUI()
+    self:Close()
 end
 
 function SchemeUI:OnCancel()
-    if not self.isopen then
-        return
-    end
-
 	local taggable = self.attach.components.taggable
     if taggable ~= nil then
         taggable:OnCloseWidget()
     end
 
-    self.owner.HUD:CloseSchemeUI()
+    self:Close()
 end
 
 function SchemeUI:OnControl(control, down)
@@ -212,13 +199,11 @@ function SchemeUI:OnControl(control, down)
 end
 
 function SchemeUI:Close()
-	if self.isopen then
-        self.attach = nil
-        self.black:Kill()
-        self.isopen = false
+    SetPause(false)
+	TheInput:EnableDebugToggle(true)
 
-        self.inst:DoTaskInTime(.3, function() TheFrontEnd:PopScreen(self) end)
-    end
+	--self.taggable:OnCloseWidget()
+    TheFrontEnd:PopScreen(self)
 end
 
 return SchemeUI

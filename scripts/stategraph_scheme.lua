@@ -8,27 +8,24 @@ local ACTIONS = GLOBAL.ACTIONS
 local TIMEOUT = 2
 
 
-local spawng = State({
+local spawng = State({ -- copy-pasted of quicktele sg yet.
     name = "spawng",
     tags = {"doing", "busy", "canrotate"},
 
     onenter = function(inst)
-		inst.components.locomotor:Stop()
-        inst.AnimState:PlayAnimation("atk_pre")
-        inst.AnimState:PushAnimation("atk", false)
+        inst.AnimState:PlayAnimation("atk")
         inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
     end,
 
-    timeline = {
-        TimeEvent(15*FRAMES, function(inst) inst:PerformBufferedAction() end),
+    timeline = 
+    {
+        TimeEvent(8*FRAMES, function(inst) inst:PerformBufferedAction() end),
     },
 
     events = {
-        EventHandler("animqueueover", function(inst)
-            if inst.AnimState:AnimDone() then
-                inst.sg:GoToState("idle")
-            end
-        end),
+        EventHandler("animover", function(inst)
+            inst.sg:GoToState("idle") 
+        end ),
     },
 })
 	
@@ -37,32 +34,30 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SPAWNG, "spawng"))
 
 ---------------------------------------------------------------------------------------------
 
-local configg = State({
+local configg = State({ -- copy-pasted of quicktele sg yet.
     name = "configg",
     tags = {"doing", "busy", "canrotate"},
 
     onenter = function(inst)
-		inst.components.locomotor:Stop()
-        inst.AnimState:PlayAnimation("atk_pre")
-        inst.AnimState:PushAnimation("atk", false)
+        inst.AnimState:PlayAnimation("atk")
         inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
     end,
 
-    timeline = {
-        TimeEvent(15*FRAMES, function(inst) inst:PerformBufferedAction() end),
+    timeline = 
+    {
+        TimeEvent(8*FRAMES, function(inst) inst:PerformBufferedAction() end),
     },
 
     events = {
-        EventHandler("animqueueover", function(inst)
-            if inst.AnimState:AnimDone() then
-                inst.sg:GoToState("idle")
-            end
-        end),
+        EventHandler("animover", function(inst)
+            inst.sg:GoToState("idle") 
+        end ),
     },
 })
 	
 AddStategraphState("wilson", configg)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.CONFIGG, "configg"))
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SELECTG, "doshortaction"))
 
 -------------------------------------------------------------------------------------------------
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SELECTG, "doshortaction"))

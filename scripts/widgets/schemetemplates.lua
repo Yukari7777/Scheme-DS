@@ -9,6 +9,41 @@ local TrueScrollList = require "widgets/truescrolllist"
 
 local CHATFONT = "bellefair"
 
+local function RGB(r, g, b)
+    return { r / 255, g / 255, b / 255, 1 }
+end
+
+local GOLD = {202/255, 174/255, 118/255, 255/255}
+local GREY = {.57, .57, .57, 1}
+local BLACK = {.1, .1, .1, 1}
+local WHITE = {1, 1, 1, 1}
+local BROWN = {97/255, 73/255, 46/255, 255/255}
+local RED = {.7, .1, .1, 1}
+local DARKGREY = {.12, .12, .12, 1}
+
+local UICOLOURS = {
+    GOLD_CLICKABLE = RGB(215, 210, 157, 255), -- interactive text & menu
+    GOLD_FOCUS = RGB(251, 193, 92, 255), -- menu active item
+    GOLD_SELECTED = RGB(245, 243, 222, 255), -- titles and non-interactive important text
+    GOLD_UNIMPORTANT = RGB(213, 213, 203, 255), -- non-interactive non-important text
+    HIGHLIGHT_GOLD = RGB(243, 217, 161, 255),
+    GOLD = GOLD,
+    BROWN_MEDIUM = RGB(107, 84, 58),
+    BROWN_DARK = RGB(80, 61, 39),
+    BLUE = RGB(80, 143, 244, 255),
+    GREY = GREY,
+    BLACK = BLACK,
+    WHITE = WHITE,
+    BRONZE = RGB(180, 116, 36, 1),
+    EGGSHELL = RGB(252, 230, 201),
+    IVORY = RGB(236, 232, 223, 1),
+    IVORY_70 = RGB(165, 162, 156, 1),
+    PURPLE = RGB(152, 86, 232, 1),
+    RED = RGB(207, 61, 61, 1),
+    SLATE = RGB(155, 170, 177, 1),
+	SILVER = RGB(192, 192, 192, 1),
+}
+
 TEMPLATES = {}
 
 function TEMPLATES.ScreenRoot(name)

@@ -27,7 +27,7 @@ function Scheme:CheckConditionAndCost(doer, index)
 		return 
 	end
 
-	if doer:HasTag("player") then
+	if doer:HasTag("doer") then
 		doer.SoundEmitter:KillSound("wormhole_travel")
 		_G.ConsumeGateCost(doer, numalter, numstat)
 	end
@@ -130,12 +130,6 @@ function Scheme:FindIndex()
 	return index
 end
 
-function Scheme:SetOwner(player)
-	if player.userid ~= nil then
-		self.owner = player.userid
-	end
-end
-
 function Scheme:AddToNetwork()
 	local index = self.index ~= nil and self.index or self:FindIndex()
 
@@ -155,8 +149,8 @@ function Scheme:Disconnect(index)
 	end
 end
 
-function Scheme:SelectDest(player)
-	self.inst:PushEvent("select", {user = player})
+function Scheme:SelectDest(doer)
+	self.inst:PushEvent("select", {doer = doer})
 
 	return true
 end

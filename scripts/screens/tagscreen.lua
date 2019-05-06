@@ -11,9 +11,6 @@ local VALID_CHARS = [[ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 local TagScreen = Class(Screen, function(self, attach)
     Screen._ctor(self, "TagWriter")
 	
-	SetPause(true, "tagwidget")
-	TheInput:EnableDebugToggle(false)
-
 	local MAX_LENGTH = 64
 
     self.owner = GetPlayer()
@@ -35,7 +32,8 @@ local TagScreen = Class(Screen, function(self, attach)
     self.black.OnMouseButton = function() self:OnCancel() end
 
     self.bganim = self.root:AddChild(UIAnim())
-    self.bganim:SetScale(1, 1, 1)
+    self.bganim:SetScale(1, 0.8, 1)
+	self.bganim:SetPosition(0, -30, 0)
 	self.bganim:GetAnimState():SetBank("ui_board_5x1")
 	self.bganim:GetAnimState():SetBuild("ui_board_5x1")
 
@@ -50,37 +48,32 @@ local TagScreen = Class(Screen, function(self, attach)
     self.edit_text:SetRegionSize(430, 160)
     self.edit_text:SetHAlign(ANCHOR_LEFT)
     self.edit_text:SetTextLengthLimit(MAX_LENGTH)
-    self.edit_text:SetString("")
     self.edit_text:SetAllowClipboardPaste(true)
 	self.edit_text:OnControl(CONTROL_ACCEPT, false)
     self.edit_text.OnTextEntered = function() self:OnControl(CONTROL_ACCEPT, false) end
-
-	self:OverrideText("") -- Todo : get old string
     
 	self.cancel_button = self.root:AddChild(ImageButton())
     self.cancel_button.image:SetScale(0.7)
     self.cancel_button:SetText(STRINGS.SIGNS.MENU.CANCEL)
     self.cancel_button:SetFont(BUTTONFONT)
-    self.cancel_button:SetPosition(-50, 100, 0)
+    self.cancel_button:SetPosition(-150, -30, 0)
     self.cancel_button:SetOnClick(function() self:OnCancel() end)
 
 	self.remove_buton = self.root:AddChild(ImageButton())
     self.remove_buton.image:SetScale(0.7)
     self.remove_buton:SetText(STRINGS.SIGNS.MENU.REMOVE)
     self.remove_buton:SetFont(BUTTONFONT)
-    self.remove_buton:SetPosition(0, 100, 0)
+    self.remove_buton:SetPosition(0, -30, 0)
     self.remove_buton:SetOnClick(function() self:OnRemove() end)
 
 	self.accept_button = self.root:AddChild(ImageButton())
     self.accept_button.image:SetScale(0.7)
     self.accept_button:SetText(STRINGS.SIGNS.MENU.ACCEPT)
     self.accept_button:SetFont(BUTTONFONT)
-    self.accept_button:SetPosition(50, 100, 0)
+    self.accept_button:SetPosition(150, -30, 0)
     self.accept_button:SetOnClick(function() self:OnAccept() end)
 
-	self.default_focus = self.edit_text
     self:Show()
-	self.edit_text:SetEditing(true)
 
     if self.bgimage.texture then
         self.bgimage:Show()
@@ -89,19 +82,23 @@ local TagScreen = Class(Screen, function(self, attach)
     end
 end)
 
-function TagScreen:OverrideText(text)
-    self.edit_text:SetString(text)
-    self.edit_text:SetFocus()
+function TagScreen:OnBecomeActive()
+    TagScreen._base.OnBecomeActive(self)
+	self.owner:DoTaskInTime(4 * FRAMES, function()
+		SetPause(true, "tagwidget")
+		TheInput:EnableDebugToggle(false)
+		self.edit_text:SetFocus()
+		self.edit_text:SetEditing(true)
+		self:SetDefaultString()
+	end)
+end
+
+function TagScreen:SetDefaultString()
+	self.edit_text:SetString(self.taggable.text or "")
 end
 
 function TagScreen:GetText()
     return self.edit_text:GetString()
-end
-
-function TagScreen:OnBecomeActive()
-    self._base.OnBecomeActive(self)
-    self.edit_text:SetFocus()
-    self.edit_text:SetEditing(true)
 end
 
 function TagScreen:OnCancel()
@@ -131,22 +128,17 @@ function TagScreen:Close()
 	SetPause(false)
 	TheInput:EnableDebugToggle(true)
 
-    if self.bgimage.texture then
-        self.bgimage:Hide()
-    else
-        self.bganim:GetAnimState():PlayAnimation("close")
-    end
-
-    self.black:Kill()
-    self.edit_text:SetEditing(false)
-    self.edit_text:Kill()
-
 	self.taggable:OnCloseWidget()
     TheFrontEnd:PopScreen(self)
 end
 
 function TagScreen:OnControl(control, down)
     if TagScreen._base.OnControl(self, control, down) then return true end
+
+	if not down and (control == CONTROL_CANCEL) then 
+		self:OnCancel()
+		return true
+	end
 
 end
 

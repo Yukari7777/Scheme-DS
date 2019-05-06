@@ -1,5 +1,5 @@
-local taggables = require "taggables"
 local TagScreen = require "screens/tagscreen"
+local SchemeUI = require "screens/schemeui"
 
 local DANGER_RADIUS = 10
 local function IsInDangerFromShadowCreatures(inst)
@@ -91,12 +91,30 @@ local function IsNearDanger(inst)
 	return isdanger or isnearbosses
 end
 
+local function BeginWriting(inst)
+	TheFrontEnd:PushScreen(TagScreen(inst))
+end
+
+function SelectPopup(inst, data)
+	local doer = data.doer
+
+	if IsNearDanger(doer) then 
+		doer.components.talker:Say(GetString(doer.prefab, "NODANGERSCHEME"))
+		return 
+	end
+	inst.sg:GoToState("opening")
+
+	doer:DoTaskInTime(14 * FRAMES, function()
+		TheFrontEnd:PushScreen(SchemeUI(inst))
+	end)
+end
+
 local Taggable = Class(function(self, inst)
     self.inst = inst
     self.text = nil
 	
-    self.inst:ListenForEvent("tag", self.BeginWriting)
-    self.inst:ListenForEvent("select", self.SelectPopup)
+    self.inst:ListenForEvent("tag", BeginWriting)
+    self.inst:ListenForEvent("select", SelectPopup)
 end)
 
 function Taggable:OnSave()
@@ -109,9 +127,6 @@ end
 
 function Taggable:OnLoad(data)
     self.text = data.text
-	if IsXB1() then
-		self.netid = data.netid
-	end
 end
 
 function Taggable:OnCloseWidget()
@@ -119,11 +134,6 @@ function Taggable:OnCloseWidget()
 end
 
 function Taggable:GetText(viewer)
-	if IsXB1() then
-		if self.text and self.netid then
-			return "\1"..self.text.."\1"..self.netid
-		end
-	end
     return self.text
 end
 
@@ -134,22 +144,6 @@ end
 
 function Taggable:IsWritten()
     return self.text ~= nil
-end
-
-function Taggable:BeginWriting(doer)
-    TheFrontEnd:PushScreen(TagScreen(self))
-end
-
-function Taggable:SelectPopup(doer)
-	if IsNearDanger(doer) then 
-		doer.components.talker:Say(GetString(doer.prefab, "NODANGERSCHEME"))
-		return 
-	end
-	self.inst.sg:GoToState("opening")
-
-	doer:DoTaskInTime(14 * FRAMES, function()
-		--TheFrontEnd:PushScreen(TaggableWidget(self))
-	end)
 end
 
 function Taggable:Write(doer, text)

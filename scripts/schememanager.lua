@@ -97,10 +97,6 @@ local function SetTaggableText(player, target, text)
 			taggable:Write(player, text)
 		end
     end
-
-	if scheme ~= nil then
-		scheme:SetOwner(player)
-	end
 end
 
 local function DoTeleportWithIndex(player, index, inst)
