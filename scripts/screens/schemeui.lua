@@ -3,6 +3,7 @@ local Widget = require "widgets/widget"
 local Text = require "widgets/text"
 local ImageButton = require "widgets/imagebutton"
 local TEMPLATES = require "widgets/schemetemplates"
+local ScrollableList = require "widgets/scrolllablelist"
 
 local SchemeUI = Class(Screen, function(self, attach)
     Screen._ctor(self, "SchemeUI")
@@ -11,7 +12,7 @@ local SchemeUI = Class(Screen, function(self, attach)
     self.attach = attach
 
 	self.destdata = {}
-	self.destitem = {}
+	self.destitems = {}
 
 	self.numalter = 0
 	self.numstat = 0
@@ -68,76 +69,21 @@ local SchemeUI = Class(Screen, function(self, attach)
 	
 	self:Initialize()
     self:Show()
-    self.default_focus = self.scroll_list
 end)
 
 function SchemeUI:OnBecomeActive()
     SchemeUI._base.OnBecomeActive(self)
 	SetPause(true, "SchemeUI")
-	TheInput:EnableDebugToggle(false)
 end
 
 function SchemeUI:Initialize()
-	self:InitScroll()
-	self:MakeItem()
-	--self.cancelbutton:SetFocusChangeDir(MOVE_UP, self.scroll_list)
-end
-
-function SchemeUI:InitScroll()
-	local function ScrollWidgetsCtor(context, index)
-        local item = Widget("item-"..index)
-
-		item.button = item:AddChild(TEMPLATES.ListItemBackground(340, 30, function() end))
-		item.button.move_on_click = true
-
-		item.name = item:AddChild(Text(BODYTEXTFONT, 20))
-		item.name:SetVAlign(ANCHOR_MIDDLE)
-		item.name:SetHAlign(ANCHOR_LEFT)
-		item.name:SetPosition(0, 0, 5)
-		item.name:SetRegionSize(220, 30)
-
-		item.focus_forward = item.button
-
-        item:SetOnGainFocus(function() if self.scroll_list ~= nil then self.scroll_list:OnWidgetFocus(item) end end)
-
-        return item
-    end
-
-	local function ApplyDataToWidget(context, item, data, index)
-		if data ~= nil then
-			item.name:SetString(data.text or "")
-			item.name:SetColour(1, 1, 1, 1)
-			item.button:SetOnClick(function() self:OnSelected(data.index) end)
-		else
-			item.button:SetOnClick(nil)
-		end
-    end
-
-	self.scroll_list = self.destspanel:AddChild(TEMPLATES.ScrollingGrid(self.destdata, {
-        context = {},
-        widget_width = 250,
-        widget_height = 30,
-        num_visible_rows = 8,
-        num_columns = 1,
-        item_ctor_fn = ScrollWidgetsCtor,
-        apply_fn = ApplyDataToWidget,
-        scrollbar_offset = 10,
-        scrollbar_height_offset = -60,
-        peek_percent = 0,
-        allow_bottom_empty_row = true
-	}))
-    self.scroll_list:SetPosition(-5, 5)
-    self.scroll_list:SetFocusChangeDir(MOVE_DOWN, self.cancelbutton)
-end
-
-function SchemeUI:MakeItem()
-	local list = _G.TUNNELNETWORK
+	local destdata = _G.TUNNELNETWORK
 	local taggable = self.attach and self.attach.components.taggable
 
 	if taggable ~= nil then
-		for k, v in ipairs(list) do
-			if tonumber(list[k].index) == taggable.index then	
-				table.remove(list, k) -- delete destination towards itself.	
+		for k, v in ipairs(destdata) do
+			if tonumber(destdata[k].index) == taggable.index then	
+				table.remove(destdata, k) -- delete destination towards itself.	
 			end
 		end
 
@@ -147,12 +93,37 @@ function SchemeUI:MakeItem()
 		end
 	end
 
-	self.destdata = list
-	if self.scroll_list ~= nil then
-		self.scroll_list:SetItemsData(self.destdata)
+	for i = 1, 3 do--#destdata do 
+		local item = Widget("item"..i)
+
+		item.button = item:AddChild(TEMPLATES.ListItemBackground(340, 30, function() end))
+		item.button.move_on_click = true
+		--item.button:SetOnClick(function() self:OnSelected(destdata[i].index) end)
+
+		item.text = item:AddChild(Text(BODYTEXTFONT, 20))
+		item.text:SetVAlign(ANCHOR_MIDDLE)
+		item.text:SetHAlign(ANCHOR_LEFT)
+		item.text:SetPosition(0, 0, 5)
+		item.text:SetRegionSize(220, 30)
+		--item.text:SetString(destdata[i].text or "")
+		item.text:SetColour(1, 1, 1, 1)
+
+		item.focus_forward = item.button
+		--item.id = i
+
+		table.insert(self.destitems, item)
 	end
 
-	self.numalter, self.numstat = _G.GetCost(self.owner)
+	for k, v in pairs(self.destitems) do
+		print(k, v)
+	end
+
+	self.scroll_list = self.destspanel:AddChild(ScrollableList(self.destitems, 240, 360, 250, 30))
+
+	self.scroll_list:SetPosition(-5, 5)
+    self.scroll_list:SetFocusChangeDir(MOVE_DOWN, self.cancelbutton)
+
+	self.numalter, self.numstat = _G.GetGCost(self.owner)
 	if self.numalter ~= 0 then
 		self.alternum:SetString(": "..self.numalter)
 		self.alternum:Show()
@@ -164,6 +135,8 @@ function SchemeUI:MakeItem()
 	self.sanitynum:SetString(": "..self.numstat)
 	self.sanitynum:Show()
 	self.staticon:Show()
+
+	self.default_focus = self.scroll_list
 end
 
 function SchemeUI:OnSelected(index)
@@ -200,7 +173,6 @@ end
 
 function SchemeUI:Close()
     SetPause(false)
-	TheInput:EnableDebugToggle(true)
 
 	--self.taggable:OnCloseWidget()
     TheFrontEnd:PopScreen(self)

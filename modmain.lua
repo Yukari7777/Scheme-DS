@@ -20,8 +20,6 @@ Assets = {
 	Asset( "ATLAS", "images/dialogcurly_9slice.xml" ),
 	Asset( "IMAGE", "images/dialogrect_9slice.tex" ),
 	Asset( "ATLAS", "images/dialogrect_9slice.xml" ),
-	Asset( "IMAGE", "images/frontend_redux.tex" ),
-	Asset( "ATLAS", "images/frontend_redux.xml" ),
 	Asset( "IMAGE", "images/global_redux.tex" ),
 	Asset( "ATLAS", "images/global_redux.xml" ),
 
@@ -66,47 +64,113 @@ else
 	GLOBAL.SCHEME_LANGUAGE = Language
 end
 
-AddClassPostConstruct("screens/playerhud", function(self, anim, owner)
---[[
-	self.ShowTaggableWidget = function(self, taggable, config)
-		if taggable == nil then
-			return
-		else
-			self.taggablescreen = TaggableWidget(self.owner, taggable, config)
-			self:OpenScreenUnderPause(self.taggablescreen)
-			if TheFrontEnd ~= nil and TheFrontEnd:GetActiveScreen() == self.taggablescreen then
-				-- Have to set editing AFTER pushscreen finishes.
-				self.taggablescreen.edit_text:SetEditing(true)
+AddClassPostConstruct("widgets/button", function(self) 
+	local Button = self
+
+	function Button:SetOnDown( fn )
+		self.ondown = fn
+	end
+
+	function Button:SetWhileDown( fn )
+		self.whiledown = fn
+	end
+
+	function Button:OnControl(control, down)
+		if Button._base.OnControl(self, control, down) then return true end
+
+		if not self:IsEnabled() or not self.focus then return false end
+	
+		--if self:IsSelected() and not self.AllowOnControlWhenSelected then return false end
+	
+		if control == self.control then
+
+			if down then
+				if not self.down then
+					GLOBAL.TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_move")
+					self.o_pos = self:GetLocalPosition()
+					self:SetPosition(self.o_pos + self.clickoffset)
+					self.down = true
+					if self.whiledown then
+						self:StartUpdating()
+					end
+					if self.ondown then
+						self.ondown()
+					end
+				end
+			else
+				if self.down then
+					self.down = false
+					self:ResetPreClickPosition()
+					if self.onclick then
+						self.onclick()
+					end
+					self:StopUpdating()
+				end
 			end
-			return self.taggablescreen
+		
+			return true
 		end
 	end
-
-	self.CloseTaggableWidget = function()
-		if self.taggablescreen then
-			self.taggablescreen:Close()
-			self.taggablescreen = nil
-		end
-	end
-
-	self.ShowSchemeUI = function(src, inst)
-		if inst == nil then
-			return 
-		else
-			self.schemescreen = SchemeUI(self.owner, inst)
-			self:OpenScreenUnderPause(self.schemescreen)
-			return self.schemescreen
-		end
-	end
-
-	self.CloseSchemeUI = function(src)
-		if self.schemescreen ~= nil then
-			self.schemescreen:Close()
-			self.schemescreen = nil
-		end
-	end
-]]--
 end)
+--[[
+AddClassPostConstruct("widgets/imagebutton", function(self)
+	local ImageButton = self
+
+	function ImageButton:ForceImageSize(x, y)
+		self.size_x = x
+		self.size_y = y
+		self.image:ScaleToSize(self.size_x, self.size_y)
+	end
+
+	function ImageButton:SetImageNormalColour(r,g,b,a)
+		if type(r) == "number" then
+			self.imagenormalcolour = {r, g, b, a}
+		else
+			self.imagenormalcolour = r
+		end
+    
+		if self:IsEnabled() and not self.focus and not self.selected then
+			self.image:SetTint(self.imagenormalcolour[1], self.imagenormalcolour[2], self.imagenormalcolour[3], self.imagenormalcolour[4])
+		end
+	end
+
+	function ImageButton:SetImageFocusColour(r,g,b,a)
+		if type(r) == "number" then
+			self.imagefocuscolour = {r,g,b,a}
+		else
+			self.imagefocuscolour = r
+		end
+    
+		if self.focus and not self.selected then
+			self.image:SetTint(unpack(self.imagefocuscolour))
+		end
+	end
+
+	function ImageButton:SetImageDisabledColour(r,g,b,a)
+		if type(r) == "number" then
+			self.imagedisabledcolour = {r,g,b,a}
+		else
+			self.imagedisabledcolour = r
+		end
+    
+		if not self:IsEnabled() then
+			self.image:SetTint(unpack(self.imagedisabledcolour))
+		end
+	end
+
+	function ImageButton:SetImageSelectedColour(r,g,b,a)
+		if type(r) == "number" then
+			self.imageselectedcolour = {r,g,b,a}
+		else
+			self.imageselectedcolour = r
+		end
+    
+		if self.selected then
+			self.image:SetTint(unpack(self.imageselectedcolour))
+		end
+	end
+end)
+]]--
 
 TUNING.SCHEMETOOL_USES = 36
 local recipe = GLOBAL.Recipe("schemetool", {Ingredient("telestaff", 1), Ingredient("marble", 12), Ingredient("orangegem", 6)}, RECIPETABS.MAGIC, TECH.MAGIC_TWO)

@@ -1,5 +1,5 @@
 -- This file is to make this mod compatible for the non-DST version as some widget templates do not exist in DS.
--- Most of these contents are pure copy-pasted of DST.
+-- Most of these contents are purely copy-pasted of DST.
 local Widget = require "widgets/widget"
 local Image = require "widgets/image"
 
