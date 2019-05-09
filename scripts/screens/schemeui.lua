@@ -77,7 +77,7 @@ function SchemeUI:OnBecomeActive()
 end
 
 function SchemeUI:Initialize()
-	local destdata = _G.TUNNELNETWORK
+	local destdata = deepcopy(_G.TUNNELNETWORK)
 	local taggable = self.attach and self.attach.components.taggable
 
 	if taggable ~= nil then
@@ -93,34 +93,34 @@ function SchemeUI:Initialize()
 		end
 	end
 
-	for i = 1, 3 do--#destdata do 
+	for i = 1, #destdata do 
 		local item = Widget("item"..i)
 
-		item.button = item:AddChild(TEMPLATES.ListItemBackground(340, 30, function() end))
+		item.button = item:AddChild(TEMPLATES.ListItemBackground(280, 30, function() end))
 		item.button.move_on_click = true
-		--item.button:SetOnClick(function() self:OnSelected(destdata[i].index) end)
+		item.button:SetOnClick(function() self:OnSelected(destdata[i].index) end)
 
 		item.text = item:AddChild(Text(BODYTEXTFONT, 20))
 		item.text:SetVAlign(ANCHOR_MIDDLE)
 		item.text:SetHAlign(ANCHOR_LEFT)
 		item.text:SetPosition(0, 0, 5)
 		item.text:SetRegionSize(220, 30)
-		--item.text:SetString(destdata[i].text or "")
+		item.text:SetString(destdata[i].inst.components.taggable.text or "#"..destdata[i].index)
 		item.text:SetColour(1, 1, 1, 1)
 
 		item.focus_forward = item.button
-		--item.id = i
 
 		table.insert(self.destitems, item)
 	end
 
-	for k, v in pairs(self.destitems) do
-		print(k, v)
-	end
+	local height = 240
+	self.scroll_list = self.destspanel:AddChild(ScrollableList(self.destitems, 200, height, 25, nil, nil, nil))
 
-	self.scroll_list = self.destspanel:AddChild(ScrollableList(self.destitems, 240, 360, 250, 30))
-
-	self.scroll_list:SetPosition(-5, 5)
+	self.scroll_list.up_button:SetPosition(50, height/2-20, 0)
+	self.scroll_list.down_button:SetPosition(50, -height/2+20, 0)
+	self.scroll_list.scroll_bar_line:SetPosition(50, 0)
+	self.scroll_list.position_marker:SetPosition(50, 0)
+	self.scroll_list:SetPosition(95, 13)
     self.scroll_list:SetFocusChangeDir(MOVE_DOWN, self.cancelbutton)
 
 	self.numalter, self.numstat = _G.GetGCost(self.owner)
@@ -173,8 +173,6 @@ end
 
 function SchemeUI:Close()
     SetPause(false)
-
-	--self.taggable:OnCloseWidget()
     TheFrontEnd:PopScreen(self)
 end
 

@@ -22,6 +22,8 @@ Assets = {
 	Asset( "ATLAS", "images/dialogrect_9slice.xml" ),
 	Asset( "IMAGE", "images/global_redux.tex" ),
 	Asset( "ATLAS", "images/global_redux.xml" ),
+	Asset( "IMAGE", "images/frontend_redux.tex" ),
+	Asset( "ATLAS", "images/frontend_redux.xml" ),
 
 	Asset( "ANIM" , "anim/ui_board_5x1.zip"),
 	Asset( "ANIM" , "anim/swap_schemetool.zip"),
@@ -112,65 +114,6 @@ AddClassPostConstruct("widgets/button", function(self)
 		end
 	end
 end)
---[[
-AddClassPostConstruct("widgets/imagebutton", function(self)
-	local ImageButton = self
-
-	function ImageButton:ForceImageSize(x, y)
-		self.size_x = x
-		self.size_y = y
-		self.image:ScaleToSize(self.size_x, self.size_y)
-	end
-
-	function ImageButton:SetImageNormalColour(r,g,b,a)
-		if type(r) == "number" then
-			self.imagenormalcolour = {r, g, b, a}
-		else
-			self.imagenormalcolour = r
-		end
-    
-		if self:IsEnabled() and not self.focus and not self.selected then
-			self.image:SetTint(self.imagenormalcolour[1], self.imagenormalcolour[2], self.imagenormalcolour[3], self.imagenormalcolour[4])
-		end
-	end
-
-	function ImageButton:SetImageFocusColour(r,g,b,a)
-		if type(r) == "number" then
-			self.imagefocuscolour = {r,g,b,a}
-		else
-			self.imagefocuscolour = r
-		end
-    
-		if self.focus and not self.selected then
-			self.image:SetTint(unpack(self.imagefocuscolour))
-		end
-	end
-
-	function ImageButton:SetImageDisabledColour(r,g,b,a)
-		if type(r) == "number" then
-			self.imagedisabledcolour = {r,g,b,a}
-		else
-			self.imagedisabledcolour = r
-		end
-    
-		if not self:IsEnabled() then
-			self.image:SetTint(unpack(self.imagedisabledcolour))
-		end
-	end
-
-	function ImageButton:SetImageSelectedColour(r,g,b,a)
-		if type(r) == "number" then
-			self.imageselectedcolour = {r,g,b,a}
-		else
-			self.imageselectedcolour = r
-		end
-    
-		if self.selected then
-			self.image:SetTint(unpack(self.imageselectedcolour))
-		end
-	end
-end)
-]]--
 
 TUNING.SCHEMETOOL_USES = 36
 local recipe = GLOBAL.Recipe("schemetool", {Ingredient("telestaff", 1), Ingredient("marble", 12), Ingredient("orangegem", 6)}, RECIPETABS.MAGIC, TECH.MAGIC_TWO)
