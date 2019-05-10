@@ -40,7 +40,7 @@ GLOBAL.GetGCost = function(player, isspawn)
 		leftover = isspawn and TUNING.YUKARI.SPAWNG_POWER_COST or player.components.upgrader.schemecost or 75
 		isyukari = true
 	elseif alterprefab ~= "noalter" then
-		numalter = FindItemInSlots(player.components.inventory:GetItems(), numalter)
+		numalter = FindItemInSlots(player.components.inventory.itemslots, numalter)
 		for k, v in pairs(player.components.inventory.itemslots) do
 			if type(v) == "table" and v.components.container ~= nil then
 				numalter = FindItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, numalter)

@@ -80,12 +80,11 @@ configuration_options = {
 		hover = "Set which item should be used for alternatives for the cost of sanity.\n정신력 대신 사용될 아이템을 정합니다.",
 		options = {
 			{ description = "No alter",			data = "noalter" },
-			{ description = "Desert Stone",		data = "townportaltalisman" },
 			{ description = "Purple Gem",		data = "purplegem" },
 			{ description = "Orange Gem",		data = "orangegem" },
 			{ description = "Nightmare Fuel",	data = "nightmarefuel" },
 		},
-		default = "townportaltalisman",
+		default = "nightmarefuel",
 	},
 
 	{

@@ -82,6 +82,7 @@ function SchemeUI:Initialize()
 
 	if taggable ~= nil then
 		for k, v in ipairs(destdata) do
+			print(destdata[k].index, taggable.index)
 			if tonumber(destdata[k].index) == taggable.index then	
 				table.remove(destdata, k) -- delete destination towards itself.	
 			end

@@ -15,7 +15,7 @@ local DRAG_SCROLL_X_THRESHOLD = 150
 
 local SCROLLBAR_STYLE = {
     BLACK = {
-        atlas = "images/ui.xml",
+        atlas = "images/ui_redux.xml",
         up = "arrow_scrollbar_up.tex",
         down = "arrow_scrollbar_down.tex",
         bar = "scrollbarline.tex",
@@ -70,7 +70,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
 
     self.view_offset = starting_offset or 0
 
-    -- self.widget_bg = self:AddChild(Image("images/ui.xml", "1percent_clickbox.tex"))
+    -- self.widget_bg = self:AddChild(Image("images/ui_redux.xml", "1percent_clickbox.tex"))
     -- self.widget_bg:SetTint(1,1,1,0)
     -- self.widget_bg:ScaleToSize(self.width, self.height)
 
@@ -110,7 +110,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.scroll_bar_line:ScaleToSize( 11*bar_width_scale_factor, self.height - arrow_button_size - 20)
     self.scroll_bar_line:SetPosition(self.width/2, 0)
 
-    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButton("images/ui.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0}))
+    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButton("images/ui_redux.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0}))
     self.scroll_bar.image:ScaleToSize( 32, self.height - arrow_button_size - 20)
     self.scroll_bar.image:SetTint(1,1,1,0)
     self.scroll_bar.scale_on_focus = false

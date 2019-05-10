@@ -13,7 +13,7 @@ local function IsInDangerFromShadowCreatures(inst)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local ents = TheSim:FindEntities(x, y, z, DANGER_RADIUS * 2, { "shadowcreature" })
 	for k, v in ipairs(ents) do
-		if ((not ignoreshadowcreature) or (v.components.combat ~= nil and v.components.combat.target == inst)) and not v.components.shadowsubmissive:ShouldSubmitToTarget(inst) then
+		if ((not ignoreshadowcreature) or (v.components.combat ~= nil and v.components.combat.target == inst)) then
 			isdanger = true
 			break
 		end
@@ -139,7 +139,6 @@ end
 
 function Taggable:SetText(text)
     self.text = text
-	_G.TUNNELNETWORK[self.inst.components.scheme.index].text = text
 end
 
 function Taggable:IsWritten()

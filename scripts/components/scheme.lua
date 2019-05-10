@@ -1,10 +1,7 @@
 local Scheme = Class(function(self, inst)
     self.inst = inst
+	
 	self.index = nil
-
-	self.owner = nil
-	--self.permlevel = 1
-
 	self.pointer = nil
 end)
 

@@ -31,8 +31,10 @@ function MakeGate:Teleport(pt, caster)
 		caster.Transform:SetPosition(pt.x, pt.y, pt.z)
 		caster:Show()
 	end)
-	
-	self.onusefn(self.inst, pt, caster)
+
+	if self.onusefn == nil then
+		self.onusefn(self.inst, pt, caster)
+	end
 	
 	return true
 end
@@ -75,14 +77,14 @@ function MakeGate:Configurate(target, caster)
 end
 
 function MakeGate:CollectEquippedActions(doer, target, actions, right)
-	if right and target:HasTag("tunnel")then
+	if right and target:HasTag("tunnel") then
 		table.insert(actions, ACTIONS.CONFIGG)
 	end
 end
 
 function MakeGate:CollectPointActions(doer, pos, actions, right)
-    if right then
-		if self.inst.prefab == "yukariumbre" and doer:HasTag("yakumoyukari") and doer.components.power ~= nil then
+	if right then
+		if doer:HasTag("yakumoyukari") and self.inst.prefab == "yukariumbre" and doer.components.power ~= nil then
 			if self.inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.SPAWNG_POWER_COST then
 				table.insert(actions, ACTIONS.SPAWNG)
 			elseif not self.inst.isunfolded and doer.components.power:GetCurrent() >= TUNING.YUKARI.TELEPORT_POWER_COST then
