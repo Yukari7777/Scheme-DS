@@ -26,7 +26,7 @@ function Scheme:CheckConditionAndCost(doer, index)
 
 	if doer:HasTag("doer") then
 		doer.SoundEmitter:KillSound("wormhole_travel")
-		_G.ConsumeGateCost(doer, numalter, numstat)
+		_G.ConsumeGateCost(doer, numalter, numstat, false)
 	end
 	return true
 end
@@ -132,7 +132,7 @@ function Scheme:AddToNetwork()
 
 	_G.TUNNELNETWORK[index] = {
 		inst = self.inst,
-		index = self.index
+		index = index
 	}
 	_G.NUMTUNNEL = _G.NUMTUNNEL + 1
 	self.index = index
@@ -154,13 +154,10 @@ end
 
 function Scheme:InitGate()
 	self:AddToNetwork()
-	if _G.NUMTUNNEL > 1 then
-		self.inst.islinked = true
-	end
 end
 
 function Scheme:CollectSceneActions(doer, actions, right)
-	if self.inst:HasTag("teleporter") then
+	if self.inst:HasTag("teleporter") and _G.NUMTUNNEL > 1 then
 		table.insert(actions, ACTIONS.SELECTG)
     end
 end

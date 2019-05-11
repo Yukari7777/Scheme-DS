@@ -63,7 +63,7 @@ configuration_options = {
 		label = "Spawn cost(소환 코스트)",
 		hover = "Set sanity cost on creating Scheme Gate.\n스키마 게이트를 소환할 때의 비용을 설정합니다.",
 		options = spawncost,
-		default = 100,
+		default = 0,
 	},
 
 	{

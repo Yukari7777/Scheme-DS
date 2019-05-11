@@ -24,8 +24,8 @@ Assets = {
 	Asset( "ATLAS", "images/global_redux.xml" ),
 	Asset( "IMAGE", "images/frontend_redux.tex" ),
 	Asset( "ATLAS", "images/frontend_redux.xml" ),
-	Asset( "IMAGE", "images/ui_redux.tex" ),
-	Asset( "ATLAS", "images/ui_redux.xml" ),
+	Asset( "IMAGE", "images/1percent_clickbox.tex" ),
+	Asset( "ATLAS", "images/1percent_clickbox.xml" ),
 
 	Asset( "ANIM" , "anim/ui_board_5x1.zip"),
 	Asset( "ANIM" , "anim/swap_schemetool.zip"),

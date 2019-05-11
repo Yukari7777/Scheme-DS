@@ -33,12 +33,10 @@ GLOBAL.GetGCost = function(player, isspawn)
 	local numalter = 0
 	local numtouse = 0
 	local leftover = _COST
-	local isyukari = false
 
 	if player:HasTag("yakumoyukari") then
 		numalter = 0
 		leftover = isspawn and TUNING.YUKARI.SPAWNG_POWER_COST or player.components.upgrader.schemecost or 75
-		isyukari = true
 	elseif alterprefab ~= "noalter" then
 		numalter = FindItemInSlots(player.components.inventory.itemslots, numalter)
 		for k, v in pairs(player.components.inventory.itemslots) do
@@ -54,9 +52,10 @@ GLOBAL.GetGCost = function(player, isspawn)
 end
 
 GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
+	print(player, numitem, numstat, isspawn)
 	local leftoveritem = numitem
 	if leftoveritem ~= 0 then
-		leftoveritem = ConsumeItemInSlots(player.components.inventory:GetItems(), leftoveritem)
+		leftoveritem = ConsumeItemInSlots(player.components.inventory.itemslots, leftoveritem)
 		for k, v in pairs(player.components.inventory.itemslots) do
 			if type(v) == "table" and v.components.container ~= nil then
 				leftoveritem = ConsumeItemInSlots(player.components.inventory:GetEquippedItem(k).components.container.slots, leftoveritem)

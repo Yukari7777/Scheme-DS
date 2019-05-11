@@ -2,7 +2,9 @@
 -- Most of these contents are purely copy-pasted of DST.
 
 local Widget = require "widgets/widget"
+local Image = require "widgets/image"
 local ImageButton = require "widgets/imagebutton"
+local ImageButtonRedux = require "widgets/imagebutton_redux"
 
 local scroll_per_click = 1
 local scroll_per_page = 5
@@ -14,23 +16,12 @@ local arrow_button_size = 40
 local DRAG_SCROLL_X_THRESHOLD = 150
 
 local SCROLLBAR_STYLE = {
-    BLACK = {
-        atlas = "images/ui_redux.xml",
-        up = "arrow_scrollbar_up.tex",
-        down = "arrow_scrollbar_down.tex",
-        bar = "scrollbarline.tex",
-        handle = "scrollbarbox.tex",
-        --~ scale = 0.4,
-        scale = 1.0,
-    },
-    GOLD = {
-        atlas = "images/global_redux.xml",
-        up = "scrollbar_arrow_up.tex",
-        down = "scrollbar_arrow_down.tex",
-        bar = "scrollbar_bar.tex",
-        handle = "scrollbar_handle.tex",
-        scale = 0.3,
-    }
+    atlas = "images/global_redux.xml",
+    up = "scrollbar_arrow_up.tex",
+    down = "scrollbar_arrow_down.tex",
+    bar = "scrollbar_bar.tex",
+    handle = "scrollbar_handle.tex",
+    scale = 0.3,
 }
 
 -- ScrollableList expects a table of pre-constructed items to be handed in as the "items" param OR
@@ -53,7 +44,8 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.always_show_static_widgets = always_show_static or false
     self.focused_index = 1
     self.focus_children = true
-    self.scrollbar_style = SCROLLBAR_STYLE["GOLD"]
+    self.scrollbar_style = SCROLLBAR_STYLE
+	self.xPosOverride = nil
     assert(self.scrollbar_style, "If you can't pass a valid scrollbar_style, then don't pass one at all.")
 
     self.items = items
@@ -69,11 +61,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self:RecalculateStepSize()
 
     self.view_offset = starting_offset or 0
-
-    -- self.widget_bg = self:AddChild(Image("images/ui_redux.xml", "1percent_clickbox.tex"))
-    -- self.widget_bg:SetTint(1,1,1,0)
-    -- self.widget_bg:ScaleToSize(self.width, self.height)
-
+	
     self.scroll_bar_container = self:AddChild(Widget("scroll-bar-container"))
 
     self.up_button = self.scroll_bar_container:AddChild(ImageButton(self.scrollbar_style.atlas, self.scrollbar_style.up))
@@ -91,7 +79,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     end)
     -- self.up_button:StartUpdating()
 
-    
+    --
     self.down_button = self.scroll_bar_container:AddChild(ImageButton(self.scrollbar_style.atlas, self.scrollbar_style.down))
     self.down_button:SetScale(self.scrollbar_style.scale)
     self.down_button:SetPosition(self.width/2, -self.height/2+10, 0)
@@ -109,8 +97,8 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.scroll_bar_line = self.scroll_bar_container:AddChild(Image(self.scrollbar_style.atlas, self.scrollbar_style.bar))
     self.scroll_bar_line:ScaleToSize( 11*bar_width_scale_factor, self.height - arrow_button_size - 20)
     self.scroll_bar_line:SetPosition(self.width/2, 0)
-
-    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButton("images/ui_redux.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0}))
+	
+    self.scroll_bar = self.scroll_bar_container:AddChild(ImageButtonRedux("images/1percent_clickbox.xml", "1percent_clickbox.tex", "1percent_clickbox.tex", "1percent_clickbox.tex", nil, nil, {1,1}, {0,0}))
     self.scroll_bar.image:ScaleToSize( 32, self.height - arrow_button_size - 20)
     self.scroll_bar.image:SetTint(1,1,1,0)
     self.scroll_bar.scale_on_focus = false
@@ -130,8 +118,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
             self.page_jump = false
         end
     end )
-
-    self.position_marker = self.scroll_bar_container:AddChild(ImageButton(self.scrollbar_style.atlas, self.scrollbar_style.handle))
+    self.position_marker = self.scroll_bar_container:AddChild(ImageButtonRedux(self.scrollbar_style.atlas, self.scrollbar_style.handle))
     self.position_marker.scale_on_focus = false
     self.position_marker.move_on_click = false
     self.position_marker:SetPosition(self.width/2, self.height/2 - arrow_button_size, 0)
@@ -170,66 +157,8 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self:DoFocusHookups()
 
     self:RefreshView()
+	
 end)
-
-function ScrollableList:DebugDraw_AddSection(dbui, panel)
-    ScrollableList._base.DebugDraw_AddSection(self, dbui, panel)
-
-    dbui.Spacing()
-    dbui.Text("ScrollableList")
-    dbui.Indent() do
-        local step, step_fast = 1, 5
-        local has_modified_x, out_x = dbui.InputFloat("width", self.width, step, step_fast)
-        if has_modified_x then
-            self.width = out_x
-        end
-        local has_modified_y, out_y = dbui.InputFloat("height", self.height, step, step_fast)
-        if has_modified_y then
-            self.height = out_y
-        end
-        local has_modified_height, out_height = dbui.InputFloat("item_height", self.item_height, step, step_fast)
-        if has_modified_height then
-            self.item_height = out_height
-        end
-        local has_modified_padding, out_padding = dbui.InputFloat("item_padding", self.item_padding, step, step_fast)
-        if has_modified_padding then
-            self.item_padding = out_padding
-        end
-        local has_modified_offset, out_offset = dbui.InputFloat("x_offset", self.x_offset, step, step_fast)
-        if has_modified_offset then
-            self.x_offset = out_offset
-        end
-        local has_modified_initialy, out_initialy = dbui.InputFloat("yInitial", self.yInitial, step, step_fast)
-        if has_modified_initialy then
-            self.yInitial = out_initialy
-        end
-        local has_modified_show, out_show = dbui.Checkbox("always_show_static_widgets", self.always_show_static_widgets)
-        if has_modified_show then
-            self.always_show_static_widgets = out_show
-        end
-        dbui.Value("focused_index", self.focused_index)
-        dbui.Checkbox("focus_children", self.focus_children)
-        dbui.Value("#items", #self.items)
-        --~ local item_names = {}
-        --~ for i,val in ipairs(self.items) do
-        --~     table.insert(item_names, tostring(val))
-        --~ end
-        --~ dbui.ListBox("items", item_names)
-
-        if has_modified_x or has_modified_y or has_modified_height or has_modified_padding or has_modified_offset or has_modified_initialy or has_modified_show then
-            -- Resize commands copied from ctor
-            self.bg:ScaleToSize(self.width, self.height)
-            self.up_button:SetPosition(self.width/2, self.height/2-10, 0)
-            self.down_button:SetPosition(self.width/2, -self.height/2+10, 0)
-            self.scroll_bar_line:SetPosition(self.width/2, 0)
-            self.scroll_bar:SetPosition(self.width/2, 0)
-
-            self:LayOutStaticWidgets(self.yInitial)
-            self:RefreshView(true)
-        end
-    end
-    dbui.Unindent()
-end
 
 function ScrollableList:OnControl(control, down, force)
     if ScrollableList._base.OnControl(self, control, down) then return true end
