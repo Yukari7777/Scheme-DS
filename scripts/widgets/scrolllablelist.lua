@@ -45,7 +45,6 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.focused_index = 1
     self.focus_children = true
     self.scrollbar_style = SCROLLBAR_STYLE
-	self.xPosOverride = nil
     assert(self.scrollbar_style, "If you can't pass a valid scrollbar_style, then don't pass one at all.")
 
     self.items = items
@@ -77,9 +76,7 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.up_button:SetOnClick( function()
         self.last_up_button_time = nil
     end)
-    -- self.up_button:StartUpdating()
 
-    --
     self.down_button = self.scroll_bar_container:AddChild(ImageButton(self.scrollbar_style.atlas, self.scrollbar_style.down))
     self.down_button:SetScale(self.scrollbar_style.scale)
     self.down_button:SetPosition(self.width/2, -self.height/2+10, 0)
@@ -92,7 +89,6 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
     self.down_button:SetOnClick( function()
         self.last_down_button_time = nil
     end)
-    -- self.down_button:StartUpdating()
 
     self.scroll_bar_line = self.scroll_bar_container:AddChild(Image(self.scrollbar_style.atlas, self.scrollbar_style.bar))
     self.scroll_bar_line:ScaleToSize( 11*bar_width_scale_factor, self.height - arrow_button_size - 20)
@@ -150,7 +146,6 @@ local ScrollableList = Class(Widget, function(self, items, listwidth, listheight
         self:MoveMarkerToNearestStep() 
     end)
 
-    --self.position_marker:MoveToBack()
     self.scroll_bar_line:MoveToBack()
     self.scroll_bar_container:SetScale(1, bar_height_scale_factor)
 

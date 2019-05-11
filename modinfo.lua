@@ -1,6 +1,6 @@
 name = "Scheme"
-version = "2.1.3"
-description = "Suspicious, Creepy gaps linking space and space.\n수상하고, 소름돋는, 공간과 공간을 잇는 틈새.\n\n\nVersion : "..version
+version = "1.0"
+description = "Suspicious, Creepy gaps linking space and space.\n\n\nVersion : "..version
 author = "Yakumo Yukari"
 forumthread = ""
 api_version = 6
@@ -63,7 +63,7 @@ configuration_options = {
 		label = "Spawn cost(소환 코스트)",
 		hover = "Set sanity cost on creating Scheme Gate.\n스키마 게이트를 소환할 때의 비용을 설정합니다.",
 		options = spawncost,
-		default = 0,
+		default = 100,
 	},
 
 	{
@@ -92,7 +92,7 @@ configuration_options = {
 		label = "Alternatives value(대체템 가치)",
 		hover = "Set alternative's value.\n대체템의 가치를 정합니다.",
 		options = alterval,
-		default = 50,
+		default = 15,
 	},
 
 	{

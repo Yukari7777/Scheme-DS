@@ -32,7 +32,7 @@ function MakeGate:Teleport(pt, caster)
 		caster:Show()
 	end)
 
-	if self.onusefn == nil then
+	if self.onusefn ~= nil then
 		self.onusefn(self.inst, pt, caster)
 	end
 	

@@ -30,8 +30,8 @@ local function GetDesc(inst, viewer)
 	local index = inst.components.scheme.index or -1
 	local text = inst.components.taggable:GetText() or "#"..index
 
-	if text == "#1" and _G.NUMTUNNEL == 1 then
-		return GetDescription(viewer, inst)
+	if _G.NUMTUNNEL == 1 then
+		return string.format(text).."\n"..GetDescription(viewer.prefab, inst)
 	end
 
 	return string.format(text)

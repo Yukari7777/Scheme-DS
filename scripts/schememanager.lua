@@ -1,5 +1,6 @@
 GLOBAL.TUNNELNETWORK = {}
 GLOBAL.NUMTUNNEL = 0
+GLOBAL.SCHEME_ENABLED = true
 local alterprefab = GetModConfigData("alter")
 local altervalue = GetModConfigData("alterval")
 local usecost = GetModConfigData("usecost")
@@ -52,7 +53,6 @@ GLOBAL.GetGCost = function(player, isspawn)
 end
 
 GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
-	print(player, numitem, numstat, isspawn)
 	local leftoveritem = numitem
 	if leftoveritem ~= 0 then
 		leftoveritem = ConsumeItemInSlots(player.components.inventory.itemslots, leftoveritem)
@@ -80,6 +80,7 @@ GLOBAL.ConsumeGateCost = function(player, numitem, numstat, isspawn)
 				end
 			end
 		end
+
 		if numstat ~= 0 then
 			player.components.sanity:DoDelta(-numstat)
 		end

@@ -24,7 +24,7 @@ function Scheme:CheckConditionAndCost(doer, index)
 		return 
 	end
 
-	if doer:HasTag("doer") then
+	if doer:HasTag("character") then
 		doer.SoundEmitter:KillSound("wormhole_travel")
 		_G.ConsumeGateCost(doer, numalter, numstat, false)
 	end
@@ -35,6 +35,7 @@ function Scheme:Activate(doer, index)
 	local index = tonumber(index)
 	if not self:CheckConditionAndCost(doer, index) then return end
 
+	doer.sg:GoToState("jumpin", { teleporter = doer })
 	self:OnActivate(self:GetTarget(index), doer)
 	self:Teleport(doer, index)
 

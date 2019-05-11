@@ -159,7 +159,6 @@ end
 
 function Taggable:Teleport(doer, index)
 	if index ~= nil then
-		doer.sg:GoToState("jumpin", { teleporter = doer })
 		doer:DoTaskInTime(0.8, function()
 			self.inst.components.scheme:Activate(doer, index)
 			self.inst.sg:GoToState("closing")

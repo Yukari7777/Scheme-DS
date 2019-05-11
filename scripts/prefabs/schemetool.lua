@@ -46,6 +46,7 @@ local function fn()
 	inst:AddComponent("finiteuses")    
 	inst.components.finiteuses:SetMaxUses(TUNING.SCHEMETOOL_USES)
 	inst.components.finiteuses:SetUses(TUNING.SCHEMETOOL_USES)
+	inst.components.finiteuses:SetOnFinished(function() inst:Remove() end)
 
 	inst:AddComponent("equippable")
 	inst.components.equippable:SetOnEquip( onequip )
