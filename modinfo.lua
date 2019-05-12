@@ -1,5 +1,5 @@
 name = "Scheme"
-version = "1.0"
+version = "1.0.2"
 description = "Suspicious, Creepy gaps linking space and space.\n\n\nVersion : "..version
 author = "Yakumo Yukari"
 forumthread = ""
@@ -20,15 +20,6 @@ folder_name = folder_name or ""
 if not folder_name:find("workshop-") then
     name = name.." - Test"
 end
-
-server_filter_tags = {
-	"utilities",
-	"wormhole",
-	"tunnel",
-	"teleport",
-	"scheme",
-	"API",
-}
 
 local spawncost = {}
 for i = 0, 500 do spawncost[i + 1] = { description = ""..i.."", data = i } end

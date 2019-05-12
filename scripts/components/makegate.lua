@@ -41,7 +41,7 @@ end
 
 function MakeGate:Create(pt, caster)
 	local numalter, numstat = _G.GetGCost(caster, true)
-	if caster.components.sanity ~= nil and math.ceil(caster.components.sanity.current) < numstat then caster.components.talker:Say(GetString(caster.prefab, "LOWCGSANITY")) return true end
+	if not caster:HasTag("yakumoyukari") and caster.components.sanity ~= nil and math.ceil(caster.components.sanity.current) < numstat then caster.components.talker:Say(GetString(caster.prefab, "LOWCGSANITY")) return true end
 	_G.ConsumeGateCost(caster, numalter, numstat, true)
 	if self.inst:HasTag("schemetool") then
 		self.inst.components.finiteuses:Use(6)
