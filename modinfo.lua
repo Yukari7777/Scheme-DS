@@ -1,5 +1,5 @@
 name = "Scheme"
-version = "1.0.2"
+version = "1.0.3"
 description = "Suspicious, Creepy gaps linking space and space.\n\n\nVersion : "..version
 author = "Yakumo Yukari"
 forumthread = ""
@@ -15,11 +15,6 @@ dst_compatible = false
 
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
-
-folder_name = folder_name or ""
-if not folder_name:find("workshop-") then
-    name = name.." - Test"
-end
 
 local spawncost = {}
 for i = 0, 500 do spawncost[i + 1] = { description = ""..i.."", data = i } end
@@ -38,10 +33,10 @@ for i = 0, 4 do GPL[i + 1] = { description = ""..i.."", data = i } end
 configuration_options = {
 	{
 		name = "language",
-		label = "언어(Language)",
-		hover = "언어설정\nSet Language",
+		label = "anguage",
+		hover = "Set Language",
 		options = {
-			{ description = "자동(Auto)", data = "AUTO" },
+			{ description = "Auto", data = "AUTO" },
 			{ description = "한국어", data = "kr" },
 			{ description = "English", data = "en" },
 			--{ description = "中文", data = "ch" },
@@ -51,7 +46,7 @@ configuration_options = {
 	},
 	{
 		name = "spawncost",
-		label = "Spawn cost(소환 코스트)",
+		label = "Spawn cost",
 		hover = "Set sanity cost on creating Scheme Gate.\n스키마 게이트를 소환할 때의 비용을 설정합니다.",
 		options = spawncost,
 		default = 100,
@@ -59,7 +54,7 @@ configuration_options = {
 
 	{
 		name = "usecost",
-		label = "Use cost(사용 코스트)",
+		label = "Use cost",
 		hover = "Set sanity cost of using Scheme Gate.\n스키마 게이트를 사용할 때의 비용을 설정합니다.",
 		options = usecost,
 		default = 50,
@@ -67,7 +62,7 @@ configuration_options = {
 
 	{
 		name = "alter",
-		label = "Cost alternatives(정신력 대체템)",
+		label = "Cost alternatives",
 		hover = "Set which item should be used for alternatives for the cost of sanity.\n정신력 대신 사용될 아이템을 정합니다.",
 		options = {
 			{ description = "No alter",			data = "noalter" },
@@ -80,7 +75,7 @@ configuration_options = {
 
 	{
 		name = "alterval",
-		label = "Alternatives value(대체템 가치)",
+		label = "Alternatives value",
 		hover = "Set alternative's value.\n대체템의 가치를 정합니다.",
 		options = alterval,
 		default = 15,
@@ -88,29 +83,22 @@ configuration_options = {
 
 	{
 		name = "ignoredanger",
-		label = "Ignore danger(위험 무시)",
+		label = "Ignore danger",
 		hover = "Should ignore danger nearby on teleporting?\n순간이동 할 때 주변의 위험 요소들을 무시합니까?",
 		options = {
-			{ description = "no(무시안함)", data = false },
-			{ description = "yes(무시함)",	data = true },
+			{ description = "no", data = false },
+			{ description = "yes",	data = true },
 		},
 		default = false,
 	},
 	{
 		name = "ignoreboss",
-		label = "Ignore boss(보스 무시)",
+		label = "Ignore boss",
 		hover = "Should teleport when a boss is nearby?\n보스가 있을때도 순간이동이 가능합니까?",
 		options = {
-			{ description = "no(무시안함)", data = false },
-			{ description = "yes(무시함)",	data = true },
+			{ description = "no", data = false },
+			{ description = "yes",	data = true },
 		},
 		default = false,
 	},
---	{
---		name = "permission",
---		label = "Global permission level",
---		hover = "0 = Everyone can use or modify.[see mod page for more info]\n1 = Everyone can use, cannot modify.\n2 = Only allowed user can use or modify.\n3 = Only allowed user can use, cannot modify.\n4 = Only original owner can only use.",
---		options = GPL,
---		default = 1,
---	},
 }

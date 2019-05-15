@@ -56,7 +56,7 @@ if Language == "AUTO" then
 	local KnownModIndex = GLOBAL.KnownModIndex
 	for _, moddir in ipairs(KnownModIndex:GetModsToLoad()) do
 		local modname = KnownModIndex:GetModInfo(moddir).name
-		if modname == "한글 모드 서버 버전" or modname == "한글 모드 클라이언트 버전" then 
+		if modname == "Korean Translation" then 
 			GLOBAL.SCHEME_LANGUAGE = "kr"
 --		elseif modname == "Chinese modname Pack" or modname == "Chinese Plus" then
 --			GLOBAL.SCHEME_LANGUAGE = "ch"
