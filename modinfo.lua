@@ -1,5 +1,5 @@
 name = "Scheme"
-version = "1.0.3"
+version = "1.0.4"
 description = "Suspicious, Creepy gaps linking space and space.\n\n\nVersion : "..version
 author = "Yakumo Yukari"
 forumthread = ""
@@ -11,6 +11,7 @@ dont_starve_compatible = true
 reign_of_giants_compatible = true
 shipwrecked_compatible = true
 porkland_compatible = true
+hamlet_compatible = true
 dst_compatible = false
 
 icon_atlas = "modicon.xml"

@@ -37,7 +37,7 @@ GLOBAL.GetGCost = function(player, isspawn)
 
 	if player:HasTag("yakumoyukari") then
 		numalter = 0
-		leftover = isspawn and TUNING.YUKARI.SPAWNG_POWER_COST or player.components.upgrader.schemecost or 75
+		leftover = isspawn and TUNING.YUKARI.SPAWNG_POWER_COST or player.components.upgrader.SchemeCost or 75
 	elseif alterprefab ~= "noalter" then
 		numalter = FindItemInSlots(player.components.inventory.itemslots, numalter)
 		for k, v in pairs(player.components.inventory.itemslots) do

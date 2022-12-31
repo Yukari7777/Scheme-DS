@@ -16,10 +16,10 @@ end
 function Scheme:CheckConditionAndCost(doer, index)
 	if not self:IsConnected(index) then return end
 	local numalter, numstat = _G.GetGCost(doer, false)
-	if doer:HasTag("yakumoyukari") and doer.components.power ~= nil and doer.components.talker ~= nil and doer.components.power.current < doer.components.upgrader.schemecost then 
+	if doer:HasTag("yakumoyukari") and doer.components.power ~= nil and doer.components.talker ~= nil and math.ceil(doer.components.power.current) < doer.components.upgrader.SchemeCost then 
 		doer.components.talker:Say(GetString(doer.prefab, "DESCRIBE_LOWPOWER"))
 		return
-	elseif not doer:HasTag("yakumoyukari") and not doer.components.inventory:EquipHasTag("shadowdominance") and (doer.components.sanity ~= nil and doer.components.sanity.current < numstat) then
+	elseif not doer:HasTag("yakumoyukari") and not doer.components.inventory:EquipHasTag("shadowdominance") and doer.components.sanity ~= nil and math.ceil(doer.components.sanity.current) < numstat then
 		doer.components.talker:Say(GetString(doer.prefab, "LOWUSEGSANITY")) 
 		return 
 	end
